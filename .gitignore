@@ -65,3 +65,5 @@ bin/
 include/
 
 .idea/
+
+pypi-stats-cache/

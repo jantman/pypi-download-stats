@@ -35,48 +35,21 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 ##################################################################################
 """
 
-from setuptools import setup, find_packages
-from pypi_download_stats.version import VERSION, PROJECT_URL
+import logging
 
-with open('README.rst') as file:
-    long_description = file.read()
+logger = logging.getLogger(__name__)
 
-requires = [
-    'google-api-python-client>=1.5.0',
-    'oauth2client>=3.0.0'
-]
 
-classifiers = [
-    'Development Status :: 3 - Alpha',
-    'Environment :: Console',
-    'Intended Audience :: Developers',
-    'License :: OSI Approved :: GNU Affero General Public License v3 '
-    'or later (AGPLv3+)',
-    'Natural Language :: English',
-    'Operating System :: OS Independent',
-    'Programming Language :: Python',
-    'Programming Language :: Python :: 2.7',
-    'Programming Language :: Python :: 3',
-    'Topic :: Internet :: Log Analysis',
-    'Topic :: Software Development',
-    'Topic :: Utilities'
-]
+class ProjectStats(object):
 
-setup(
-    name='pypi-download-stats',
-    version=VERSION,
-    author='Jason Antman',
-    author_email='jason@jasonantman.com',
-    packages=find_packages(),
-    url=PROJECT_URL,
-    description='Calculate detailed download stats and generate HTML and '
-                'badges for PyPI packages',
-    long_description=long_description,
-    install_requires=requires,
-    keywords="pypi warehouse download stats badge",
-    classifiers=classifiers,
-    entry_points="""
-    [console_scripts]
-    pypi-download-stats = pypi_download_stats.runner:main
-    """,
-)
+    def __init__(self, project_name, cache_instance):
+        """
+        Initialize a ProjectStats class for the specified project.
+        :param project_name: project name to calculate stats for
+        :type project_name: str
+        :param cache_instance: DataCache instance
+        :type cache_instance: :py:class:`~.DiskDataCache`
+        """
+        logger.debug('Initializing ProjectStats for project: %s', project_name)
+        self.project_name = project_name
+        self.cache = cache_instance

@@ -35,48 +35,57 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 ##################################################################################
 """
 
-from setuptools import setup, find_packages
-from pypi_download_stats.version import VERSION, PROJECT_URL
+import sys
+import logging
+import pytest
 
-with open('README.rst') as file:
-    long_description = file.read()
-
-requires = [
-    'google-api-python-client>=1.5.0',
-    'oauth2client>=3.0.0'
-]
-
-classifiers = [
-    'Development Status :: 3 - Alpha',
-    'Environment :: Console',
-    'Intended Audience :: Developers',
-    'License :: OSI Approved :: GNU Affero General Public License v3 '
-    'or later (AGPLv3+)',
-    'Natural Language :: English',
-    'Operating System :: OS Independent',
-    'Programming Language :: Python',
-    'Programming Language :: Python :: 2.7',
-    'Programming Language :: Python :: 3',
-    'Topic :: Internet :: Log Analysis',
-    'Topic :: Software Development',
-    'Topic :: Utilities'
-]
-
-setup(
-    name='pypi-download-stats',
-    version=VERSION,
-    author='Jason Antman',
-    author_email='jason@jasonantman.com',
-    packages=find_packages(),
-    url=PROJECT_URL,
-    description='Calculate detailed download stats and generate HTML and '
-                'badges for PyPI packages',
-    long_description=long_description,
-    install_requires=requires,
-    keywords="pypi warehouse download stats badge",
-    classifiers=classifiers,
-    entry_points="""
-    [console_scripts]
-    pypi-download-stats = pypi_download_stats.runner:main
-    """,
+from pypi_download_stats.runner import (
+    set_log_level_format, set_log_debug, set_log_info
 )
+
+# https://code.google.com/p/mock/issues/detail?id=249
+# py>=3.4 should use unittest.mock not the mock package on pypi
+if (
+        sys.version_info[0] < 3 or
+        sys.version_info[0] == 3 and sys.version_info[1] < 4
+):
+    from mock import patch, call, Mock, DEFAULT  # noqa
+else:
+    from unittest.mock import patch, call, Mock, DEFAULT  # noqa
+
+pbm = 'pypi_download_stats.runner'
+
+
+class TestRunner(object):
+
+    def test_set_log_info(self):
+        with patch('%s.set_log_level_format' % pbm) as mock_set:
+            set_log_info()
+        assert mock_set.mock_calls == [
+            call(logging.INFO, '%(asctime)s %(levelname)s:%(name)s:%(message)s')
+        ]
+
+    def test_set_log_debug(self):
+        with patch('%s.set_log_level_format' % pbm) as mock_set:
+            set_log_debug()
+        assert mock_set.mock_calls == [
+            call(logging.DEBUG,
+                 "%(asctime)s [%(levelname)s %(filename)s:%(lineno)s - "
+                 "%(name)s.%(funcName)s() ] %(message)s")
+        ]
+
+    def test_set_log_level_format(self):
+        mock_handler = Mock(spec_set=logging.Handler)
+        with patch('%s.logger' % pbm) as mock_logger:
+            with patch('%s.logging.Formatter' % pbm) as mock_formatter:
+                type(mock_logger).handlers = [mock_handler]
+                set_log_level_format(5, 'foo')
+        assert mock_formatter.mock_calls == [
+            call(fmt='foo')
+        ]
+        assert mock_handler.mock_calls == [
+            call.setFormatter(mock_formatter.return_value)
+        ]
+        assert mock_logger.mock_calls == [
+            call.setLevel(5)
+        ]

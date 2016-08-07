@@ -44,6 +44,14 @@ I have neither the time to dedicate to that, the money to cover some sort
 of hosting and bandwidth, nor the desire to handle how to architect this for
 over 85,000 projects as opposed to my few.
 
+Hopefully stats like these will eventually end up in the official PyPI; see
+warehouse `#699 <https://github.com/pypa/warehouse/issues/699>`_,
+`#188 <https://github.com/pypa/warehouse/issues/188>`_ and
+`#787 <https://github.com/pypa/warehouse/issues/787>`_ for reference on that work.
+For the time being, I want to (a) give myself a way to get simple download stats
+and badges like the old PyPI legacy (downloads per day, week and month) as well
+as (b) enable some higher-granularity analysis.
+
 **Note** this package is *very* young; I wrote it as an evening/weekend project,
 hoping to only take a few days on it. Though writing this makes me want to bathe
 immediately, it has no tests. If people start using it, I'll change that.
@@ -80,21 +88,32 @@ It's recommended that you install into a virtual environment (virtualenv /
 venv). See the `virtualenv usage documentation <http://www.virtualenv.org/en/latest/>`_
 for information on how to create a venv.
 
+This isn't on pypi yet, ironically. Until it is:
+
 .. code-block:: bash
 
-    pip install pypi-download-stats
+    $ pip install git+https://github.com/jantman/pypi-download-stats.git
 
 Configuration
 -------------
 
-Something here.
-
-Something about Google creds, if I can figure out how to do that again.
+You'll need Google Cloud credentials for a project that has the BigQuery API
+enabled. The recommended method is to generate system account credentials;
+download the JSON file for the credentials and export the path to it as the
+``GOOGLE_APPLICATION_CREDENTIALS`` environment variable. The system account
+will need to be added as a Project Member.
 
 Usage
 -----
 
 Something else here.
+
+Cost
+++++
+
+At this point... I have no idea. Some of the download tables are 3+ GB per day.
+I imagine that backfilling historical data from the beginning of what's currently
+there (20160122) might incur quite a bit of data cost.
 
 Bugs and Feature Requests
 -------------------------

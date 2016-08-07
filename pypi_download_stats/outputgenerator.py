@@ -35,48 +35,32 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 ##################################################################################
 """
 
-from setuptools import setup, find_packages
-from pypi_download_stats.version import VERSION, PROJECT_URL
+import logging
 
-with open('README.rst') as file:
-    long_description = file.read()
+logger = logging.getLogger(__name__)
 
-requires = [
-    'google-api-python-client>=1.5.0',
-    'oauth2client>=3.0.0'
-]
 
-classifiers = [
-    'Development Status :: 3 - Alpha',
-    'Environment :: Console',
-    'Intended Audience :: Developers',
-    'License :: OSI Approved :: GNU Affero General Public License v3 '
-    'or later (AGPLv3+)',
-    'Natural Language :: English',
-    'Operating System :: OS Independent',
-    'Programming Language :: Python',
-    'Programming Language :: Python :: 2.7',
-    'Programming Language :: Python :: 3',
-    'Topic :: Internet :: Log Analysis',
-    'Topic :: Software Development',
-    'Topic :: Utilities'
-]
+class OutputGenerator(object):
 
-setup(
-    name='pypi-download-stats',
-    version=VERSION,
-    author='Jason Antman',
-    author_email='jason@jasonantman.com',
-    packages=find_packages(),
-    url=PROJECT_URL,
-    description='Calculate detailed download stats and generate HTML and '
-                'badges for PyPI packages',
-    long_description=long_description,
-    install_requires=requires,
-    keywords="pypi warehouse download stats badge",
-    classifiers=classifiers,
-    entry_points="""
-    [console_scripts]
-    pypi-download-stats = pypi_download_stats.runner:main
-    """,
-)
+    def __init__(self, project_name, stats, output_dir):
+        """
+        Initialize an OutputGenerator for one project.
+
+        :param project_name: name of the project to generate output for
+        :type project_name: str
+        :param stats: ProjectStats instance for the project
+        :type stats: :py:class:`~.ProjectStats`hey
+        :param output_dir: path to write project output to
+        :type output_dir: str
+        """
+        logger.debug('Initializing OutputGenerator for project %s '
+                     '(output_dir=%s)', project_name, output_dir)
+        self.project_name = project_name
+        self.stats = stats
+        self.output_dir = output_dir
+
+    def generate_all(self):
+        """
+        Generate all output types and write to disk.
+        """
+        raise NotImplementedError()
