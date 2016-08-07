@@ -67,3 +67,4 @@ include/
 .idea/
 
 pypi-stats-cache/
+pypi-stats/

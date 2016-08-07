@@ -53,3 +53,41 @@ class ProjectStats(object):
         logger.debug('Initializing ProjectStats for project: %s', project_name)
         self.project_name = project_name
         self.cache = cache_instance
+        self.cache_dates = self.cache.get_dates_for_project(project_name)
+        self.cache_data = {}
+        self.as_of_date = self._cache_get(
+            self.cache_dates[-1])['cache_metadata']['updated']
+
+    def _cache_get(self, date):
+        """
+        Return cache data for the specified day; cache locally in this class.
+
+        :param date: date to get data for
+        :type date: datetime.datetime
+        :return: cache data for date
+        :rtype: dict
+        """
+        if date in self.cache_data:
+            logger.debug('Using class-cached data for date %s',
+                         date.strftime('%Y-%m-%d'))
+            return self.cache_data[date]
+        logger.debug('Getting data from cache for date %s',
+                     date.strftime('%Y-%m-%d'))
+        data = self.cache.get(self.project_name, date)
+        self.cache_data[date] = data
+        return data
+
+    @property
+    def per_version_data(self):
+        """
+        Return download data by version for num_days
+
+        :return: dict of cache data; keys are datetime objects, values are
+          dict of version (str) to count (int)
+        :rtype: dict
+        """
+        ret = {}
+        for cache_date in self.cache_dates:
+            data = self._cache_get(cache_date)
+            ret[cache_date] = data['by_project_version']
+        return ret

@@ -43,7 +43,9 @@ with open('README.rst') as file:
 
 requires = [
     'google-api-python-client>=1.5.0',
-    'oauth2client>=3.0.0'
+    'oauth2client>=3.0.0',
+    'bokeh>=0.12.1',
+    'pandas>=0.16.1'
 ]
 
 classifiers = [
@@ -68,6 +70,7 @@ setup(
     author='Jason Antman',
     author_email='jason@jasonantman.com',
     packages=find_packages(),
+    package_data={'pypi-download-stats': ['templates/*.html']},
     url=PROJECT_URL,
     description='Calculate detailed download stats and generate HTML and '
                 'badges for PyPI packages',
