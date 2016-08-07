@@ -17,7 +17,7 @@ import os
 import re
 # to let sphinx find the actual source...
 sys.path.insert(0, os.path.abspath("../.."))
-from pypi-download-stats.version import _VERSION
+from pypi_download_stats.version import VERSION
 import sphinx.environment
 from docutils.utils import get_source_line
 
@@ -29,12 +29,12 @@ from docutils.utils import get_source_line
 is_rtd = os.environ.get('READTHEDOCS', None) != 'True'
 readthedocs_version = os.environ.get('READTHEDOCS_VERSION', '')
 
-rtd_version = _VERSION
+rtd_version = VERSION
 
 if (readthedocs_version in ['stable', 'latest', 'master'] or
     re.match(r'^\d+\.\d+\.\d+', readthedocs_version)):
     # this is a tag or stable/latest/master; show the actual version
-    rtd_version = _VERSION
+    rtd_version = VERSION
 
 # -- General configuration ------------------------------------------------
 
@@ -302,7 +302,8 @@ linkcheck_ignore = [
     r'https?://www\.virtualenv\.org.*',
     r'https?://.*\.readthedocs\.org.*',
     r'https?://codecov\.io.*',
-    r'https?://.*readthedocs\.org.*'
+    r'https?://.*readthedocs\.org.*',
+    r'https?://pypi\.python\.org/pypi/pypi-download-stats'
 ]
 
 # exclude module docstrings - see http://stackoverflow.com/a/18031024/211734

@@ -36,20 +36,30 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 """
 
 from setuptools import setup, find_packages
-from sys import version_info
-from pypi-download-stats.version import VERSION, PROJECT_URL
+from pypi_download_stats.version import VERSION, PROJECT_URL
 
 with open('README.rst') as file:
     long_description = file.read()
 
 requires = [
-    'something'
+    'google-api-python-client>=1.5.0',
+    'oauth2client>=3.0.0'
 ]
 
 classifiers = [
-    'Development Status :: 1 - Planning',
+    'Development Status :: 3 - Alpha',
+    'Environment :: Console',
+    'Intended Audience :: Developers',
+    'License :: OSI Approved :: GNU Affero General Public License v3 '
+    'or later (AGPLv3+)',
+    'Natural Language :: English',
+    'Operating System :: OS Independent',
     'Programming Language :: Python',
+    'Programming Language :: Python :: 2.7',
     'Programming Language :: Python :: 3',
+    'Topic :: Internet :: Log Analysis',
+    'Topic :: Software Development',
+    'Topic :: Utilities'
 ]
 
 setup(
@@ -59,9 +69,10 @@ setup(
     author_email='jason@jasonantman.com',
     packages=find_packages(),
     url=PROJECT_URL,
-    description='Description here.',
+    description='Calculate detailed download stats and generate HTML and '
+                'badges for PyPI packages',
     long_description=long_description,
     install_requires=requires,
-    keywords="",
+    keywords="pypi warehouse download stats badge",
     classifiers=classifiers
 )

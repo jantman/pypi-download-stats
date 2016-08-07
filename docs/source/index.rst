@@ -1,16 +1,12 @@
 .. meta::
-   :description: Description of your package here
+   :description: Calculate detailed download stats and generate HTML and badges for PyPI packages
 
 pypi-download-stats
-================
+===================
 
 .. image:: https://img.shields.io/pypi/v/pypi-download-stats.svg
    :target: https://pypi.python.org/pypi/pypi-download-stats
    :alt: PyPi package version
-
-.. image:: https://img.shields.io/pypi/dm/pypi-download-stats.svg
-   :target: https://pypi.python.org/pypi/pypi-download-stats
-   :alt: PyPi downloads
 
 .. image:: https://img.shields.io/github/forks/jantman/pypi-download-stats.svg
    :alt: GitHub Forks
@@ -23,8 +19,6 @@ pypi-download-stats
 .. image:: http://www.repostatus.org/badges/0.1.0/active.svg
    :alt: Project Status: Active - The project has reached a stable, usable state and is being actively developed.
    :target: http://www.repostatus.org/#active
-
-Master:
 
 .. image:: https://secure.travis-ci.org/jantman/pypi-download-stats.png?branch=master
    :target: http://travis-ci.org/jantman/pypi-download-stats
@@ -41,24 +35,6 @@ Master:
 .. image:: https://readthedocs.org/projects/pypi-download-stats/badge/?version=latest
    :target: https://readthedocs.org/projects/pypi-download-stats/?badge=latest
    :alt: sphinx documentation for latest release
-
-Develop:
-
-.. image:: https://secure.travis-ci.org/jantman/pypi-download-stats.png?branch=develop
-   :target: http://travis-ci.org/jantman/pypi-download-stats
-   :alt: travis-ci for develop branch
-
-.. image:: https://landscape.io/github/jantman/pypi-download-stats/develop/landscape.svg
-   :target: https://landscape.io/github/jantman/pypi-download-stats/develop
-   :alt: Code Health
-
-.. image:: https://codecov.io/github/jantman/pypi-download-stats/coverage.svg?branch=develop
-   :target: https://codecov.io/github/jantman/pypi-download-stats?branch=develop
-   :alt: coverage report for develop branch
-
-.. image:: https://readthedocs.org/projects/pypi-download-stats/badge/?version=develop
-   :target: https://readthedocs.org/projects/pypi-download-stats/?badge=develop
-   :alt: sphinx documentation for develop branch
 
 
 Contents

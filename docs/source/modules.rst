@@ -1,7 +1,7 @@
-pypi-download-stats
-===============
+pypi_download_stats
+===================
 
 .. toctree::
    :maxdepth: 4
 
-   pypi-download-stats
+   pypi_download_stats

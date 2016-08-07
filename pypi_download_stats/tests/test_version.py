@@ -35,10 +35,9 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 ##################################################################################
 """
 
-import pypi-download-stats.version as version
+import pypi_download_stats.version as version
 
 import re
-import sys
 
 
 class TestVersion(object):

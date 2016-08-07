@@ -1,14 +1,6 @@
 pypi-download-stats
 ========================
 
-.. image:: https://pypip.in/v/pypi-download-stats/badge.png
-   :target: https://crate.io/packages/pypi-download-stats
-   :alt: pypi version
-
-.. image:: https://pypip.in/d/pypi-download-stats/badge.png
-   :target: https://crate.io/packages/pypi-download-stats
-   :alt: pypi downloads
-
 .. image:: https://img.shields.io/github/forks/jantman/pypi-download-stats.svg
    :alt: GitHub Forks
    :target: https://github.com/jantman/pypi-download-stats/network
@@ -33,11 +25,47 @@ pypi-download-stats
    :target: https://readthedocs.org/projects/pypi-download-stats/?badge=latest
    :alt: sphinx documentation for latest release
 
-.. image:: http://www.repostatus.org/badges/0.1.0/active.svg
-   :alt: Project Status: Active - The project has reached a stable, usable state and is being actively developed.
-   :target: http://www.repostatus.org/#active
+.. image:: http://www.repostatus.org/badges/latest/wip.svg
+   :alt: Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.
+   :target: http://www.repostatus.org/#wip
 
-Introduction here.
+Introduction
+------------
+
+This package retrieves download statistics from Google BigQuery for one or more
+`PyPI <https://pypi.python.org/pypi>`_ packages, caches them locally, and then
+generates some statistics (JSON and pretty HTML) as well as download count badges.
+It's intended to be run on a schedule (i.e. daily) and have the results uploaded
+somewhere.
+
+It would certainly be nice to make this into a real service (and some extension
+points for that have been included), but at the moment
+I have neither the time to dedicate to that, the money to cover some sort
+of hosting and bandwidth, nor the desire to handle how to architect this for
+over 85,000 projects as opposed to my few.
+
+**Note** this package is *very* young; I wrote it as an evening/weekend project,
+hoping to only take a few days on it. Though writing this makes me want to bathe
+immediately, it has no tests. If people start using it, I'll change that.
+
+Background
+----------
+
+Sometime in February 2016, `download stats <https://bitbucket.org/pypa/pypi/issues/396/download-stats-have-stopped-working-again>`_
+stopped working on pypi.python.org. As I later learned, what we currently (August 2016)
+know as pypi is really the `pypi-legacy <https://github.com/pypa/pypi-legacy>`_ codebase,
+and is far from a stable hands-off service. The `small team of interpid souls <https://caremad.io/2016/05/powering-pypi/>`_
+who keep it running have their hands full simply keeping it online, while also working
+on its replacement, `warehouse <https://github.com/pypa/warehouse>`_ (which as of August 2016 is available online
+at `https://pypi.io/ <https://pypi.io/>`_). While the actual pypi.python.org web UI hasn't been
+switched over to the warehouse code yet (it's still under development), the current Warehouse
+service does provide full access to pypi. It's completely understandable that, given all this
+and the "life support" status of the legacy pypi codebase, download stats in a legacy codebase
+are their last concern.
+
+However, current download statistics (actually the raw log information) since January 22, 2016
+are `available in a Google BigQuery public dataset <https://mail.python.org/pipermail/distutils-sig/2016-May/028986.html>`_
+and being updated in near-real-time. There may be download statistics functionality
 
 Requirements
 ------------
@@ -50,8 +78,7 @@ Installation
 
 It's recommended that you install into a virtual environment (virtualenv /
 venv). See the `virtualenv usage documentation <http://www.virtualenv.org/en/latest/>`_
-for information on how to create a venv. If you really want to install
-system-wide, you can (using sudo).
+for information on how to create a venv.
 
 .. code-block:: bash
 
@@ -61,6 +88,8 @@ Configuration
 -------------
 
 Something here.
+
+Something about Google creds, if I can figure out how to do that again.
 
 Usage
 -----
@@ -96,19 +125,12 @@ Guidelines
 ----------
 
 * pep8 compliant with some exceptions (see pytest.ini)
-* 100% test coverage with pytest (with valid tests)
 
 Testing
 -------
 
-Testing is done via `pytest <http://pytest.org/latest/>`_, driven by `tox <http://tox.testrun.org/>`_.
-
-* testing is as simple as:
-
-  * ``pip install tox``
-  * ``tox``
-
-* If you want to pass additional arguments to pytest, add them to the tox command line after "--". i.e., for verbose pytext output on py27 tests: ``tox -e py27 -- -v``
+There isn't any right now. I'm bad. If people actually start using this, I'll
+refactor and add tests, but for now this started as a one-night project.
 
 Release Checklist
 -----------------
@@ -117,7 +139,7 @@ Release Checklist
 2. Confirm that there are CHANGES.rst entries for all major changes.
 3. Ensure that Travis tests passing in all environments.
 4. Ensure that test coverage is no less than the last release (ideally, 100%).
-5. Increment the version number in webhook2lambda2sqs/version.py and add version and release date to CHANGES.rst, then push to GitHub.
+5. Increment the version number in pypi-download-stats/version.py and add version and release date to CHANGES.rst, then push to GitHub.
 6. Confirm that README.rst renders correctly on GitHub.
 7. Upload package to testpypi:
 
@@ -126,13 +148,13 @@ Release Checklist
    * ``python setup.py register -r https://testpypi.python.org/pypi``
    * ``python setup.py sdist bdist_wheel``
    * ``twine upload -r test dist/*``
-   * Check that the README renders at https://testpypi.python.org/pypi/webhook2lambda2sqs
+   * Check that the README renders at https://testpypi.python.org/pypi/pypi-download-stats
 
 8. Create a pull request for the release to be merged into master. Upon successful Travis build, merge it.
 9. Tag the release in Git, push tag to GitHub:
 
-   * tag the release. for now the message is quite simple: ``git tag -a vX.Y.Z -m 'X.Y.Z released YYYY-MM-DD'``
-   * push the tag to GitHub: ``git push origin vX.Y.Z``
+   * tag the release. for now the message is quite simple: ``git tag -a X.Y.Z -m 'X.Y.Z released YYYY-MM-DD'``
+   * push the tag to GitHub: ``git push origin X.Y.Z``
 
 11. Upload package to live pypi:
 
