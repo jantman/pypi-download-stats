@@ -38,20 +38,27 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 import logging
 import os
 import shutil
-# from platform import node as platform_node
-# from getpass import getuser
-# import pytz
-# import tzlocal
+from platform import node as platform_node
+from getpass import getuser
+from datetime import datetime
 from collections import OrderedDict, defaultdict
 
-# from jinja2 import Environment, PackageLoader
+import pytz
+import tzlocal
+from jinja2 import Environment, PackageLoader
 
-from bokeh.charts import Area, output_file, defaults, show
+from .version import VERSION, PROJECT_URL
 
 logger = logging.getLogger(__name__)
 
 
 class OutputGenerator(object):
+
+    # this list defines the order in which graphs will show up on the page
+    GRAPH_KEYS = [
+        'foo',
+        'bar'
+    ]
 
     def __init__(self, project_name, stats, output_dir):
         """
@@ -67,9 +74,8 @@ class OutputGenerator(object):
         logger.debug('Initializing OutputGenerator for project %s '
                      '(output_dir=%s)', project_name, output_dir)
         self.project_name = project_name
-        self.stats = stats
-        self.base_dir = os.path.abspath(os.path.expanduser(output_dir))
-        self.output_dir = os.path.join(self.base_dir, project_name)
+        self._stats = stats
+        self.output_dir = os.path.abspath(os.path.expanduser(output_dir))
         if os.path.exists(self.output_dir):
             logger.debug('Removing existing per-project directory: %s',
                          self.output_dir)
@@ -77,37 +83,42 @@ class OutputGenerator(object):
         logger.debug('Creating per-project output directory: %s',
                      self.output_dir)
         os.makedirs(self.output_dir)
+        self._graphs = {}
 
-    def _data_dict_to_bokeh_chart_data(self, data):
+    def _generate_html(self):
         """
-        Take a dictionary of data, as returned by the :py:class:`~.ProjectStats`
-        per_*_data properties, return a 2-tuple of data dict and x labels list
-        usable by bokeh.charts.
+        Generate the HTML for the specified graphs.
 
-        :param data: data dict from :py:class:`~.ProjectStats` property
-        :type data: dict
-        :return: 2-tuple of data dict, x labels list
-        :rtype: tuple
+        :return:
+        :rtype:
         """
-        labels = []
-        # find all the data keys
-        keys = set()
-        for date in data:
-            for k in data[date]:
-                keys.add(k)
-        # final output dict
-        out_data = {}
-        for k in keys:
-            out_data[k] = []
-        # transform the data; deal with sparse data
-        for data_date, data_dict in sorted(data.items()):
-            labels.append(data_date)
-            for k in out_data:
-                if k in data_dict:
-                    out_data[k].append(data_dict[k])
-                else:
-                    out_data[k].append(0)
-        return out_data, labels
+        env = Environment(
+            loader=PackageLoader('pypi_download_stats', 'templates'),
+            extensions=['jinja2.ext.loopcontrols'])
+        env.filters['format_date_long'] = filter_format_date_long
+        env.filters['format_date_ymd'] = filter_format_date_ymd
+        template = env.get_template('base.html')
+
+        # DEBUG
+        self._graphs = {
+            'foo': {'fooA': 'fooAval', 'fooB': 'fooBval', 'title': 'Foo'},
+            'bar': {'barA': 'barAval', 'barB': 'barBval', 'title': 'Bar'}
+        }
+        self.GRAPH_KEYS = ['foo', 'bar']
+        # END DEBUG
+
+        html = template.render(
+            project=self.project_name,
+            curr_date=datetime.now(
+                pytz.utc).astimezone(tzlocal.get_localzone()),
+            user=getuser(),
+            host=platform_node(),
+            version=VERSION,
+            proj_url=PROJECT_URL,
+            graphs=self._graphs,
+            graph_keys=self.GRAPH_KEYS
+        )
+        return html
 
     def _generate_by_version(self):
         """
@@ -116,100 +127,37 @@ class OutputGenerator(object):
         :return:
         :rtype:
         """
-        data, labels = self._data_dict_to_bokeh_chart_data(self.stats.per_version_data)
-        defaults.width = 400
-        defaults.height = 400
-        area2 = Area(data, x=labels, title='Downloads By Version', legend="top_left",
-                     stack=True, xlabel='Date', ylabel='Downloads')
-        output_file('graph.html', title='downloads by version')
-        show(area)
+        pass
 
-    def generate_all(self):
+    def generate(self):
         """
         Generate all output types and write to disk.
         """
-        self._generate_by_version()
+        html = self._generate_html()
+        html_path = os.path.join(self.output_dir, 'index.html')
+        with open(html_path, 'w') as fh:
+            fh.write(html)
+        logger.info('HTML report written to %s', html_path)
 
 
-def filter_resource_dict_sort(d):
+def filter_format_date_long(dt):
     """
-    Used to sort a dictionary of resources, tuple-of-strings key and int value,
-    sorted reverse by value and alphabetically by key within each value set.
+    Format a datetime into a long string
+
+    :param dt: datetime to format
+    :type dt: datetime.datetime
+    :returns: long date string
+    :rtype: str
     """
-    items = list(d.items())
-    keyfunc = lambda x: tuple([-x[1]] + list(x[0]))
-    return OrderedDict(sorted(items, key=keyfunc))
+    return dt.strftime('%Y-%m-%d %H:%M:%S%z (%Z)')
 
-
-"""
-env = Environment(loader=PackageLoader('pypuppetdb_daily_report', 'templates'), extensions=['jinja2.ext.loopcontrols'])
-    env.filters['reportmetricname'] = filter_report_metric_name
-    env.filters['reportmetricformat'] = filter_report_metric_format
-    env.filters['resourcedictsort'] = filter_resource_dict_sort
-    template = env.get_template('base.html')
-
-    run_info = {
-        'version': VERSION,
-        'date_s': datetime.datetime.now(pytz.utc).astimezone(tzlocal.get_localzone()).strftime('%Y-%m-%d %H:%M:%S%z %Z'),
-        'host': platform_node(),
-        'user': getuser(),
-    }
-
-    config = {
-        'start': start_date,
-        'end': end_date,
-        'num_rows': NUM_RESULT_ROWS,
-    }
-
-    html = template.render(data=date_data,
-                           dates=dates,
-                           hostname=hostname,
-                           config=config,
-                           run_info=run_info,
-                           )
-    return html
-
-
-{% for res_type, res_title in data[dates[0]]['aggregate']['nodes']['resources']['changed']|resourcedictsort  %}
-{% if loop.index > config['num_rows'] %}{% break %}{% endif %}
-{% set res_tup = (res_type, res_title) %}
-
-
-"""
-
-def filter_report_metric_name(s):
+def filter_format_date_ymd(dt):
     """
-    jinja2 filter to return the metric name for a given metric key
-    """
-    metric_names = {'with_skips': 'With Skipped Resources',
-                    'run_time_max': 'Maximum Runtime',
-                    'with_failures': 'With Failures',
-                    'with_changes': 'With Changes',
-                    'run_count': 'Total Reports',
-                    'run_time_total': 'Total Runtime',
-                    'run_time_avg': 'Average Runtime',
-                    'with_no_report': 'With No Report',
-                    'with_no_successful_runs': 'With 100% Failed Runs',
-                    'with_50+%_failed': 'With 50-100% Failed Runs',
-                    'with_too_few_runs': 'With <{n} Runs in 24h'.format(n=RUNS_PER_DAY),
-                    }
-    return metric_names.get(s, s)
+    Format a datetime into a Y-m-d string
 
-
-def filter_report_metric_format(o):
+    :param dt: datetime to format
+    :type dt: datetime.datetime
+    :returns: Y-m-d date string
+    :rtype: str
     """
-    jinja2 filter to return a formatted metric string for the given metric value
-    """
-    if isinstance(o, str):
-        return o
-    if isinstance(o, int):
-        return '{o}'.format(o=o)
-    if isinstance(o, datetime.timedelta):
-        d = delta2dict(o)
-        s = ''
-        for i in ['day', 'hour', 'minute', 'second']:
-            if d[i] > 0:
-                s += '{i}{suffix} '.format(i=d[i], suffix=i[0])
-        s = s.strip()
-        return s
-    return str(o)
+    return dt.strftime('%Y-%m-%d')

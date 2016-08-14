@@ -1,0 +1,7 @@
+    <!-- BEGIN nav.html -->
+      <ul>
+      {%- for graphkey in graph_keys %}
+        <li><a href="#graph_{{ graph_key }}">{{ graphs[graphkey]['title'] }}</a></li>
+      {%- endfor %}
+      </ul>
+    <!-- END nav.html -->
