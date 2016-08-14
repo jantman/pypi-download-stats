@@ -172,7 +172,7 @@ def main(args=None):
         logger.info('Generating output for: %s', proj)
         stats = ProjectStats(proj, cache)
         outdir = os.path.join(outpath, proj)
-        OutputGenerator(proj, stats, outdir).generate_all()
+        OutputGenerator(proj, stats, outdir).generate()
 
 
 if __name__ == "__main__":
