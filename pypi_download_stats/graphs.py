@@ -55,7 +55,7 @@ class FancyAreaGraph(object):
     Wrapper around bokeh.charts.Area to make it look and work nicer.
     """
 
-    def __init__(self, identifier, title, data, labels):
+    def __init__(self, identifier, title, data, labels, y_name):
         """
         Initialize a wrapper around :py:class:`bokeh.charts.Area` that handles
         our data format, makes it look nice, and makes
@@ -70,6 +70,8 @@ class FancyAreaGraph(object):
         :type data: dict
         :param labels: X-axis labels (dates), :py:class:`datetime.datetime`
         :type labels: list
+        :param y_name: tooltip name for Y data series
+        :type y_name: str
         """
         logger.debug('Initializing graph for %s ("%s")', identifier, title)
         self._graph_id = identifier
@@ -77,9 +79,11 @@ class FancyAreaGraph(object):
         self._data = data
         self._labels = labels
         self._y_series_names = [k for k in data.keys()]
-        # set our Date and FmtDate elements - x axis keys, and HoverTool text
-        data['Date'] = labels
-        data['FmtDate'] = [x.strftime('%Y-%m-%d') for x in labels]
+        self._y_name = y_name
+        # Date elements - x axis keys
+        self._data['Date'] = labels
+        # FmtDate elements -  and HoverTool text
+        self._data['FmtDate'] = [x.strftime('%Y-%m-%d') for x in labels]
 
     def generate_graph(self):
         """
@@ -90,6 +94,7 @@ class FancyAreaGraph(object):
         :rtype: tuple
         """
         logger.debug('Generating graph for %s', self._graph_id)
+        # @TODO - fix this, make responsive
         defaults.width = 1000
         defaults.height = 800
         # tools to use
@@ -102,12 +107,10 @@ class FancyAreaGraph(object):
             ResizeTool()
         ]
 
-        print(self._data)
-        print(self._y_series_names)
         # generate the stacked area graph
         g = Area(self._data, x='Date', y=self._y_series_names,
-                 title="Downloads by Version", legend="top_left",
-                 stack=True, xlabel='Date', ylabel='Downloads', tools=tools)
+                 title=self._title, legend="top_left", stack=True,
+                 xlabel='Date', ylabel='Downloads', tools=tools)
 
         lines = []
         # add a line at the top of each Patch (stacked area) for hovertool
@@ -126,7 +129,7 @@ class FancyAreaGraph(object):
         g.add_tools(
             HoverTool(
                 tooltips=[
-                    ('Version', '@SeriesName'),
+                    (self._y_name, '@SeriesName'),
                     ('Date', '@FmtDate'),
                     ('Downloads', '@Downloads'),
                 ],
@@ -150,9 +153,10 @@ class FancyAreaGraph(object):
         :type renderer: bokeh.models.renderers.GlyphRenderer
         :param series_name: the data series name this Patches represents
         :type series_name: str
-        :return:
-        :rtype:
+        :return: GlyphRenderer for a Line at the top edge of this Patch
+        :rtype: bokeh.models.renderers.GlyphRenderer
         """
+        # @TODO this method needs a major refactor
         # get the original x and y values, and color
         xvals = deepcopy(renderer.data_source.data['x_values'][0])
         yvals = deepcopy(renderer.data_source.data['y_values'][0])
@@ -205,9 +209,7 @@ class FancyAreaGraph(object):
             # the following are hacks for data that we want in the HoverTool tooltip
             'SeriesName': [series_name for _ in yvals],
             # formatted date
-            'FmtDate': [
-                datetime.utcfromtimestamp(x.astype(int) * 1e-9).strftime('%Y-%m-%d') for x in xvals
-            ],
+            'FmtDate': [self.datetime64_to_formatted_date(x) for x in xvals],
             # to show the exact value, not where the pointer is
             'Downloads': download_counts
         }
@@ -219,5 +221,8 @@ class FancyAreaGraph(object):
         line_ds = ColumnDataSource(data2)
         line = Line(x='x', y='y', line_color=line_color)
         lineglyph = chart.add_glyph(line_ds, line)
-        print(type(lineglyph))
         return lineglyph
+
+    def datetime64_to_formatted_date(self, dt64):
+        dt_int = dt64.astype(int) * 1e-9
+        return datetime.utcfromtimestamp(dt_int).strftime('%Y-%m-%d')

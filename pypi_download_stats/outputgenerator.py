@@ -161,7 +161,7 @@ class OutputGenerator(object):
         logger.debug('Generating by-version graph')
         title = 'Downloads by Version'
         script, div = FancyAreaGraph(
-            'by-version', title, data, labels).generate_graph()
+            'by-version', title, data, labels, 'Version').generate_graph()
         logger.debug('by-version graph generated')
         self._graphs['by-version'] = {
             'title': title,
