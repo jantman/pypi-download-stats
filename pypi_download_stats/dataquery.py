@@ -260,7 +260,8 @@ Resource-class.html>`_
         res = self._run_query(q)
         result = self._dict_for_projects()
         for row in res:
-            result[row['file_project']][row['file_version']] = row['dl_count']
+            result[row['file_project']][row['file_version']] = int(
+                row['dl_count'])
         return result
 
     def query_one_table(self, table_name):
