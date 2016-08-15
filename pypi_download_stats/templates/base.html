@@ -12,6 +12,12 @@
     <style type="text/css">
 
     </style>
+    {{ resources }}
+    {%- for graphkey in graph_keys %}
+    <!-- script for {{ graphkey }} -->
+    {{ graphs[graphkey]['script'] }}
+    <!-- end script for {{ graphkey }} -->
+    {%- endfor %}
   </head>
   <body>
     <h1>Download Report for PyPI project {{ project }}</h1>

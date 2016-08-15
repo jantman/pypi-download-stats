@@ -45,6 +45,7 @@ from bokeh.models import (PanTool, BoxZoomTool, WheelZoomTool, SaveTool,
 from bokeh.models.annotations import Legend
 from bokeh.plotting import ColumnDataSource
 from bokeh.models.glyphs import Line, Patches
+from bokeh.embed import components
 
 logger = logging.getLogger(__name__)
 
@@ -54,18 +55,31 @@ class FancyAreaGraph(object):
     Wrapper around bokeh.charts.Area to make it look and work nicer.
     """
 
-    def __init__(self):
+    def __init__(self, identifier, title, data, labels):
         """
-        Initialize an OutputGenerator for one project.
+        Initialize a wrapper around :py:class:`bokeh.charts.Area` that handles
+        our data format, makes it look nice, and makes
+        :py:class:`bokeh.models.HoverTool` work right with a stacked Area chart.
 
-        :param project_name: name of the project to generate output for
-        :type project_name: str
-        :param stats: ProjectStats instance for the project
-        :type stats: :py:class:`~.ProjectStats`hey
-        :param output_dir: path to write project output to
-        :type output_dir: str
+        :param identifier: URL-safe graph identifier
+        :type identifier: str
+        :param title: Human-readable graph title
+        :type title: str
+        :param data: dictionary of data; keys are series names, values are lists
+          of download counts
+        :type data: dict
+        :param labels: X-axis labels (dates), :py:class:`datetime.datetime`
+        :type labels: list
         """
-        pass
+        logger.debug('Initializing graph for %s ("%s")', identifier, title)
+        self._graph_id = identifier
+        self._title = title
+        self._data = data
+        self._labels = labels
+        self._y_series_names = [k for k in data.keys()]
+        # set our Date and FmtDate elements - x axis keys, and HoverTool text
+        data['Date'] = labels
+        data['FmtDate'] = [x.strftime('%Y-%m-%d') for x in labels]
 
     def generate_graph(self):
         """
@@ -75,6 +89,7 @@ class FancyAreaGraph(object):
         :return: 2-tuple (script, div)
         :rtype: tuple
         """
+        logger.debug('Generating graph for %s', self._graph_id)
         defaults.width = 1000
         defaults.height = 800
         # tools to use
@@ -87,9 +102,12 @@ class FancyAreaGraph(object):
             ResizeTool()
         ]
 
+        print(self._data)
+        print(self._y_series_names)
         # generate the stacked area graph
-        g = Area(data, x='Date', y=y, title="Downloads by Version", legend="top_left",
-                     stack=True, xlabel='Date', ylabel='Downloads', tools=tools)
+        g = Area(self._data, x='Date', y=self._y_series_names,
+                 title="Downloads by Version", legend="top_left",
+                 stack=True, xlabel='Date', ylabel='Downloads', tools=tools)
 
         lines = []
         # add a line at the top of each Patch (stacked area) for hovertool
@@ -99,7 +117,7 @@ class FancyAreaGraph(object):
             series_name = renderer.data_source.data['series'][0]
             logger.debug('Adding line for Patches %s (series: %s)', renderer,
                          series_name)
-            line = _line_for_patches(data, g, renderer, series_name)
+            line = self._line_for_patches(self._data, g, renderer, series_name)
             if line is not None:
                 lines.append(line)
         logger.debug("Lines for patches: %s", lines)
@@ -116,10 +134,9 @@ class FancyAreaGraph(object):
                 line_policy='nearest'
             )
         )
-        output_file('versionB.html', title='downloads by version', mode='inline')
-        save(g)
+        return components(g)
 
-    def _line_for_patches(data, chart, renderer, series_name):
+    def _line_for_patches(self, data, chart, renderer, series_name):
         """
         Add a line along the top edge of a Patch in a stacked Area Chart; return
         the new Glyph for addition to HoverTool.
@@ -202,44 +219,5 @@ class FancyAreaGraph(object):
         line_ds = ColumnDataSource(data2)
         line = Line(x='x', y='y', line_color=line_color)
         lineglyph = chart.add_glyph(line_ds, line)
+        print(type(lineglyph))
         return lineglyph
-
-if __name__ == "__main__":
-    data = {
-        '0.2.0': [8, 5, 5, 6, 5, 4, 3],
-        '0.3.0': [16, 10, 10, 12, 10, 8, 4],
-        '0.1.1': [8, 5, 5, 6, 5, 4, 2],
-        '0.4.1': [16, 12, 10, 15, 10, 8, 5],
-        '0.2.2': [8, 5, 5, 6, 5, 4, 2],
-        '0.2.3': [8, 5, 5, 6, 5, 4, 2],
-        '0.4.0': [16, 10, 10, 12, 10, 8, 4],
-        '0.4.2': [38, 28, 25, 41, 23, 20, 10],
-        '0.3.1': [16, 10, 9, 12, 10, 8, 4],
-        '0.2.1': [8, 5, 5, 6, 5, 4, 2],
-        '0.1.2': [8, 5, 5, 6, 5, 4, 2],
-        '0.1.3': [8, 5, 5, 6, 5, 4, 2],
-        '0.5.0': [193, 165, 171, 178, 194, 120, 76],
-        '0.4.3': [61, 36, 43, 47, 61, 8, 4],
-        '0.1.0': [8, 5, 4, 6, 5, 4, 3],
-        '0.4.4': [18, 13, 9, 12, 10, 9, 4],
-        '0.3.2': [16, 10, 9, 12, 10, 8, 4],
-    }
-
-    labels = [
-        datetime(2016, 8, 1, 0, 0),
-        datetime(2016, 8, 2, 0, 0),
-        datetime(2016, 8, 3, 0, 0),
-        datetime(2016, 8, 4, 0, 0),
-        datetime(2016, 8, 5, 0, 0),
-        datetime(2016, 8, 6, 0, 0),
-        datetime(2016, 8, 7, 0, 0)
-    ]
-
-    y = sorted(list(data.keys()))
-    data['Date'] = labels
-    data['FmtDate'] = [x.strftime('%Y-%m-%d') for x in labels]
-    logger.debug('data: %s', data)
-    logger.debug('y: %s', y)
-
-    _generateA(deepcopy(data), deepcopy(labels), deepcopy(y))
-    _generateB(deepcopy(data), deepcopy(labels), deepcopy(y))

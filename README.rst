@@ -81,6 +81,11 @@ Requirements
 * Python 2.7+ (currently tested with 2.7, 3.2, 3.3, 3.4)
 * Python `VirtualEnv <http://www.virtualenv.org/>`_ and ``pip`` (recommended installation method; your OS/distribution should have packages for these)
 
+pypi-download-stats relies on `bokeh <http://bokeh.pydata.org>`_ to generate
+pretty SVG charts that work offline, and
+`google-api-python-client <https://github.com/google/google-api-python-client/>`_
+for querying BigQuery. Each of those have additional dependencies.
+
 Installation
 ------------
 

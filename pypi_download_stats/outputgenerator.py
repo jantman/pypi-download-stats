@@ -46,8 +46,10 @@ from collections import OrderedDict, defaultdict
 import pytz
 import tzlocal
 from jinja2 import Environment, PackageLoader
+from bokeh.resources import Resources
 
 from .version import VERSION, PROJECT_URL
+from .graphs import FancyAreaGraph
 
 logger = logging.getLogger(__name__)
 
@@ -56,8 +58,7 @@ class OutputGenerator(object):
 
     # this list defines the order in which graphs will show up on the page
     GRAPH_KEYS = [
-        'foo',
-        'bar'
+        'by-version'
     ]
 
     def __init__(self, project_name, stats, output_dir):
@@ -92,6 +93,7 @@ class OutputGenerator(object):
         :return:
         :rtype:
         """
+        logger.debug('Generating templated HTML')
         env = Environment(
             loader=PackageLoader('pypi_download_stats', 'templates'),
             extensions=['jinja2.ext.loopcontrols'])
@@ -99,14 +101,7 @@ class OutputGenerator(object):
         env.filters['format_date_ymd'] = filter_format_date_ymd
         template = env.get_template('base.html')
 
-        # DEBUG
-        self._graphs = {
-            'foo': {'fooA': 'fooAval', 'fooB': 'fooBval', 'title': 'Foo'},
-            'bar': {'barA': 'barAval', 'barB': 'barBval', 'title': 'Bar'}
-        }
-        self.GRAPH_KEYS = ['foo', 'bar']
-        # END DEBUG
-
+        logger.debug('Rendering template')
         html = template.render(
             project=self.project_name,
             curr_date=datetime.now(
@@ -116,9 +111,42 @@ class OutputGenerator(object):
             version=VERSION,
             proj_url=PROJECT_URL,
             graphs=self._graphs,
-            graph_keys=self.GRAPH_KEYS
+            graph_keys=self.GRAPH_KEYS,
+            resources=Resources(mode='inline').render()
         )
+        logger.debug('Template rendered')
         return html
+
+    def _data_dict_to_bokeh_chart_data(self, data):
+        """
+        Take a dictionary of data, as returned by the :py:class:`~.ProjectStats`
+        per_*_data properties, return a 2-tuple of data dict and x labels list
+        usable by bokeh.charts.
+
+        :param data: data dict from :py:class:`~.ProjectStats` property
+        :type data: dict
+        :return: 2-tuple of data dict, x labels list
+        :rtype: tuple
+        """
+        labels = []
+        # find all the data keys
+        keys = set()
+        for date in data:
+            for k in data[date]:
+                keys.add(k)
+        # final output dict
+        out_data = {}
+        for k in keys:
+            out_data[k] = []
+        # transform the data; deal with sparse data
+        for data_date, data_dict in sorted(data.items()):
+            labels.append(data_date)
+            for k in out_data:
+                if k in data_dict:
+                    out_data[k].append(data_dict[k])
+                else:
+                    out_data[k].append(0)
+        return out_data, labels
 
     def _generate_by_version(self):
         """
@@ -127,12 +155,27 @@ class OutputGenerator(object):
         :return:
         :rtype:
         """
-        pass
+        logger.debug('Generating chart data for by-version graph')
+        data, labels = self._data_dict_to_bokeh_chart_data(
+            self._stats.per_version_data)
+        logger.debug('Generating by-version graph')
+        title = 'Downloads by Version'
+        script, div = FancyAreaGraph(
+            'by-version', title, data, labels).generate_graph()
+        logger.debug('by-version graph generated')
+        self._graphs['by-version'] = {
+            'title': title,
+            'script': script,
+            'div': div
+        }
 
     def generate(self):
         """
         Generate all output types and write to disk.
         """
+        logger.info('Generating graphs')
+        self._generate_by_version()
+        logger.info('Generating HTML')
         html = self._generate_html()
         html_path = os.path.join(self.output_dir, 'index.html')
         with open(html_path, 'w') as fh:

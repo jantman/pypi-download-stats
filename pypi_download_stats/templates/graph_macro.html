@@ -1,7 +1,8 @@
 {% macro graph_macro(graph_key, gdata) %}
     <!-- BEGIN graph_macro({{ graph_key }}) -->
     <div id="graph_{{ graph_key }}"><a name="graph_{{ graph_key }}"></a>
-      graph here - key={{ graph_key }} data={{ gdata }}
+      <h3>{{ gdata['title'] }}</h3>
+      {{ gdata['div'] }}
     </div>
     <!-- END graph_macro({{ graph_key }}) -->
 {%- endmacro %}
