@@ -123,7 +123,6 @@ class FancyAreaGraph(object):
             line = self._line_for_patches(self._data, g, renderer, series_name)
             if line is not None:
                 lines.append(line)
-        logger.debug("Lines for patches: %s", lines)
 
         # add the Hovertool, specifying only our line glyphs
         g.add_tools(

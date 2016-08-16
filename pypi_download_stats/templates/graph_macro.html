@@ -1,8 +1,32 @@
-{% macro graph_macro(graph_key, gdata) %}
+{%- macro graph_macro(graph_key, gdata) %}
     <!-- BEGIN graph_macro({{ graph_key }}) -->
     <div id="graph_{{ graph_key }}"><a name="graph_{{ graph_key }}"></a>
       <h3>{{ gdata['title'] }}</h3>
       {{ gdata['div'] }}
+      <div id="data_{{ graph_key }}">
+        {{ graph_table_macro(gdata['raw_data']) }}
+      </div>
     </div>
     <!-- END graph_macro({{ graph_key }}) -->
+{%- endmacro %}
+{%- macro graph_table_macro(data) %}
+{%- set cols = data|data_columns %}
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              {% for col in cols %}<th>{{ col }}</th>{% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {%- for dt in data %}
+            <tr>
+              <td>{{ dt|format_date_ymd }}</td>
+              {%- for col in cols %}
+              <td>{{ data[dt][col] }}</td>
+              {%- endfor %}
+            </tr>
+            {%- endfor %}
+          </tbody>
+        </table>
 {%- endmacro %}

@@ -99,6 +99,7 @@ class OutputGenerator(object):
             extensions=['jinja2.ext.loopcontrols'])
         env.filters['format_date_long'] = filter_format_date_long
         env.filters['format_date_ymd'] = filter_format_date_ymd
+        env.filters['data_columns'] = filter_data_columns
         template = env.get_template('base.html')
 
         logger.debug('Rendering template')
@@ -150,10 +151,8 @@ class OutputGenerator(object):
 
     def _generate_by_version(self):
         """
-        Generate the graph of downloads by version.
-
-        :return:
-        :rtype:
+        Generate the graph of downloads by version; append it to
+        ``self._graphs``.
         """
         logger.debug('Generating chart data for by-version graph')
         data, labels = self._data_dict_to_bokeh_chart_data(
@@ -163,10 +162,13 @@ class OutputGenerator(object):
         script, div = FancyAreaGraph(
             'by-version', title, data, labels, 'Version').generate_graph()
         logger.debug('by-version graph generated')
+        print(data)
+        print(labels)
         self._graphs['by-version'] = {
             'title': title,
             'script': script,
-            'div': div
+            'div': div,
+            'raw_data': self._stats.per_version_data
         }
 
     def generate(self):
@@ -194,6 +196,7 @@ def filter_format_date_long(dt):
     """
     return dt.strftime('%Y-%m-%d %H:%M:%S%z (%Z)')
 
+
 def filter_format_date_ymd(dt):
     """
     Format a datetime into a Y-m-d string
@@ -204,3 +207,21 @@ def filter_format_date_ymd(dt):
     :rtype: str
     """
     return dt.strftime('%Y-%m-%d')
+
+
+def filter_data_columns(data):
+    """
+    Given a dict of data such as those in :py:class:`~.ProjectStats` attributes,
+    made up of :py:class:`datetime.datetime` keys and values of dicts of column
+    keys to counts, return a list of the distinct column keys in sorted order.
+
+    :param data: data dict as returned by ProjectStats attributes
+    :type data: dict
+    :return: sorted list of distinct keys
+    :rtype: list
+    """
+    keys = set()
+    for dt, d in data.items():
+        for k in d:
+            keys.add(k)
+    return sorted([x for x in keys])
