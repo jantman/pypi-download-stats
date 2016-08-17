@@ -1,5 +1,5 @@
     <!-- BEGIN nav.html -->
-      <h3>Contents <span id="toggleall" class="toggle">(hide all)</span></h3>
+      <h3>Contents <a href="javascript:toggleAll()"><span id="toggleall" class="toggle">(hide all)</span></a></h3>
       <ul>
       {%- for graphkey in graph_keys %}
         <li><a href="#graph_{{ graphkey }}">{{ graphs[graphkey]['title'] }}</a></li>

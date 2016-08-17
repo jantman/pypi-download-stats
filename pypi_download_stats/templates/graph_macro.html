@@ -1,6 +1,6 @@
 {%- macro graph_macro(graph_key, gdata) %}
     <!-- BEGIN graph_macro({{ graph_key }}) -->
-    <a name="graph_{{ graph_key }}"><h3>{{ gdata['title'] }} <a href="javascript:toggleGraphDiv('{{ graph_key }}')"><span id="toggle_{{ graph_key }}" class="toggle">(hide)</span></a></h3></a>
+    <a name="graph_{{ graph_key }}"><h3>{{ gdata['title'] }} <a href="javascript:toggleGraphDiv('{{ graph_key }}', 0)"><span id="toggle_{{ graph_key }}" class="toggle">(hide)</span></a></h3></a>
     <div id="graph_{{ graph_key }}" class="graphdiv">
       {{ gdata['div'] }}
       <p class="toggletable"><a href="javascript:toggleTableDiv('{{ graph_key }}')"><span id="toggletable_{{ graph_key }}" class="toggle">Show Data Table</span></a></p>

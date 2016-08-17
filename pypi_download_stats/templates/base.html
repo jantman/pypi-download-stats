@@ -28,10 +28,10 @@
         }
         .graphdiv {
             margin-left: 2em;
-            visibility: visible;
+            display: block;
         }
         .datadiv {
-            visibility: hidden;
+            display: none;
         }
         table {
             border-collapse: collapse;
@@ -54,18 +54,41 @@
     </style>
 
     <script type="text/javascript">
-        function toggleAll() {}
+        function toggleAll() {
+            var togglespan = document.getElementById("toggleall");
+            console.log("togglespan.innerHtml=" + togglespan.innerHTML);
+            var force_state = 1;
+            if ( !togglespan.innerHTML || togglespan.innerHTML == "(hide all)" ) {
+                togglespan.innerHTML = "(show all)";
+                console.log("set togglespan.innerHtml to (show all)");
+                force_state = 2;
+            } else {
+                togglespan.innerHTML = "(hide all)";
+                console.log("set togglespan.innerHtml to (hide all)");
+                force_state = 1;
+            }
+            var divsToHide = document.getElementsByClassName("graphdiv");
+            var graphname = "";
+            for(var i = 0; i < divsToHide.length; i++){
+                toggleGraphDiv(divsToHide[i].id.substring(6), force_state);
+            }
+        }
 
-        function toggleGraphDiv(graphid) {
+        function toggleGraphDiv(graphid, force_state) {
+            console.log("toggleGraphDiv(" + graphid + ", " + force_state + ")");
             var div = document.getElementById("graph_" + graphid);
             var ihtml = "";
-            console.log("toggleGraphDiv(" + graphid + ") visibility=" + div.style.visibility);
-            if ( !div.style.visibility || div.style.visibility == "visible" ) {
-                div.style.visibility = "hidden";
+            if ( force_state == 2 ) {
+                div.style.display = "none";
                 ihtml = "(show)";
-                console.log("toggleGraphDiv hiding graph");
+            } else if ( force_state == 1 ) {
+                div.style.display = "block";
+                ihtml = "(hide)";
+            } else if ( !div.style.display || div.style.display == "block" ) {
+                div.style.display = "none";
+                ihtml = "(show)";
             } else {
-                div.style.visibility = "visible";
+                div.style.display = "block";
                 ihtml = "(hide)";
             }
             var togglelink = document.getElementById("toggle_" + graphid);
@@ -75,15 +98,12 @@
         function toggleTableDiv(graphid) {
             var div = document.getElementById("data_" + graphid);
             var ihtml = "";
-            console.log("toggleTableDiv(" + graphid + ") visibility=" + div.style.visibility);
-            if ( !div.style.visibility || div.style.visibility == "hidden" ) {
-                div.style.visibility = "visible";
+            if ( !div.style.display || div.style.display == "none" ) {
+                div.style.display = "block";
                 ihtml = "Hide Data Table";
-                console.log("toggleTableDiv() showing table");
             } else {
-                div.style.visibility = "hidden";
+                div.style.display = "none";
                 ihtml = "Show Data Table";
-                console.log("toggleTableDiv() hiding table");
             }
             var togglelink = document.getElementById("toggletable_" + graphid);
             togglelink.innerHTML = ihtml;
