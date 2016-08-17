@@ -1,7 +1,8 @@
     <!-- BEGIN nav.html -->
+      <h3>Contents <span id="toggleall" class="toggle">(hide all)</span></h3>
       <ul>
       {%- for graphkey in graph_keys %}
-        <li><a href="#graph_{{ graph_key }}">{{ graphs[graphkey]['title'] }}</a></li>
+        <li><a href="#graph_{{ graphkey }}">{{ graphs[graphkey]['title'] }}</a></li>
       {%- endfor %}
       </ul>
     <!-- END nav.html -->

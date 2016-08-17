@@ -95,8 +95,8 @@ class FancyAreaGraph(object):
         """
         logger.debug('Generating graph for %s', self._graph_id)
         # @TODO - fix this, make responsive
-        defaults.width = 1000
-        defaults.height = 800
+        defaults.width = 500
+        defaults.height = 400
         # tools to use
         tools = [
             PanTool(),
