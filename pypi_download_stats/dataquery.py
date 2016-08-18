@@ -278,7 +278,7 @@ Resource-class.html>`_
         # query by version
         tmp = self._query_by_version(table_name)
         for proj_name in tmp:
-            final[proj_name]['by_project_version'] = tmp[proj_name]
+            final[proj_name]['by_version'] = tmp[proj_name]
         # add to cache
         for proj_name in final:
             self.cache.set(proj_name, table_date, final[proj_name])

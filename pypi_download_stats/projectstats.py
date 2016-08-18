@@ -89,5 +89,5 @@ class ProjectStats(object):
         ret = {}
         for cache_date in self.cache_dates:
             data = self._cache_get(cache_date)
-            ret[cache_date] = data['by_project_version']
+            ret[cache_date] = data['by_version']
         return ret
