@@ -105,8 +105,8 @@ class OutputGenerator(object):
         logger.debug('Rendering template')
         html = template.render(
             project=self.project_name,
-            curr_date=datetime.now(
-                pytz.utc).astimezone(tzlocal.get_localzone()),
+            cache_date=datetime.fromtimestamp(
+                self._stats.as_of_datetime, tzlocal.get_localzone()),
             user=getuser(),
             host=platform_node(),
             version=VERSION,

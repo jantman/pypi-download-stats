@@ -36,6 +36,7 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 """
 
 import logging
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -55,8 +56,9 @@ class ProjectStats(object):
         self.cache = cache_instance
         self.cache_dates = self.cache.get_dates_for_project(project_name)
         self.cache_data = {}
-        self.as_of_date = self._cache_get(
-            self.cache_dates[-1])['cache_metadata']['updated']
+        self.as_of_timestamp = self._cache_get(
+            self.cache_dates[-1])['cache_metadata']['data_ts']
+        self.as_of_datetime = datetime.fromtimestamp(self.as_of_timestamp)
 
     def _cache_get(self, date):
         """

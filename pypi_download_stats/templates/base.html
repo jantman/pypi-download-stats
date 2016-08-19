@@ -125,7 +125,7 @@
   </head>
   <body>
     <h1>Download Report for PyPI project <a href="https://pypi.python.org/pypi/{{ project }}">{{ project }}</a></h1>
-    <h2>As of {{ curr_date|format_date_long }}</h2>
+    <h2>As of {{ cache_date|format_date_long }}</h2>
     <div id="badges">
 {% include 'badges.html' %}
     </div>
