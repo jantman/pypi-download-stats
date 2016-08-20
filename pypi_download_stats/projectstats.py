@@ -37,6 +37,8 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 
 import logging
 from datetime import datetime
+from pytz import utc
+from tzlocal import get_localzone
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +60,8 @@ class ProjectStats(object):
         self.cache_data = {}
         self.as_of_timestamp = self._cache_get(
             self.cache_dates[-1])['cache_metadata']['data_ts']
-        self.as_of_datetime = datetime.fromtimestamp(self.as_of_timestamp)
+        self.as_of_datetime = datetime.fromtimestamp(
+            self.as_of_timestamp, utc).astimezone(get_localzone())
 
     def _cache_get(self, date):
         """

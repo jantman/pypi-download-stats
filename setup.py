@@ -45,7 +45,8 @@ requires = [
     'google-api-python-client>=1.5.0',
     'oauth2client>=3.0.0',
     'bokeh==0.12.1',
-    'tzlocal'
+    'tzlocal',
+    'pytz'
 ]
 
 classifiers = [

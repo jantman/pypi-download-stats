@@ -99,7 +99,7 @@ class DiskDataCache(object):
                 data = json.loads(fh.read())
         except:
             logger.debug('Error getting from cache for project=%s date=%s',
-                         project, date.strftime('%Y-%m-%d'), exc_info=1)
+                         project, date.strftime('%Y-%m-%d'))
             return None
         data['cache_metadata']['date'] = datetime.strptime(
             data['cache_metadata']['date'],

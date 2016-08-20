@@ -40,11 +40,7 @@ import os
 import shutil
 from platform import node as platform_node
 from getpass import getuser
-from datetime import datetime
-from collections import OrderedDict, defaultdict
 
-import pytz
-import tzlocal
 from jinja2 import Environment, PackageLoader
 from bokeh.resources import Resources
 
@@ -105,8 +101,7 @@ class OutputGenerator(object):
         logger.debug('Rendering template')
         html = template.render(
             project=self.project_name,
-            cache_date=datetime.fromtimestamp(
-                self._stats.as_of_datetime, tzlocal.get_localzone()),
+            cache_date=self._stats.as_of_datetime,
             user=getuser(),
             host=platform_node(),
             version=VERSION,
