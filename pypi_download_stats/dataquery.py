@@ -238,6 +238,24 @@ Resource-class.html>`_
         stmts = ["file.project = '%s'" % p for p in self.projects]
         return "WHERE (%s)" % ' OR '.join(stmts)
 
+    def _get_newest_ts_in_table(self, table_name):
+        """
+        Return the timestamp for the newest record in the given table.
+
+        :param table_name: name of the table to query
+        :type table_name: str
+        :return: timestamp of newest row in table
+        :rtype: int
+        """
+        logger.debug('Querying for newest timestamp in table %s',
+                    table_name)
+        q = "SELECT TIMESTAMP_TO_SEC(MAX(timestamp)) AS max_ts %s;" % (
+            self._from_for_table(table_name))
+        res = self._run_query(q)
+        ts = int(res[0]['max_ts'])
+        logger.debug('Newest timestamp in table %s: %s', table_name, ts)
+        return ts
+
     def _query_by_version(self, table_name):
         """
         Query for download data broken down by version, for one day.
@@ -264,24 +282,6 @@ Resource-class.html>`_
                 row['dl_count'])
         return result
 
-    def _get_newest_ts_in_table(self, table_name):
-        """
-        Return the timestamp for the newest record in the given table.
-
-        :param table_name: name of the table to query
-        :type table_name: str
-        :return: timestamp of newest row in table
-        :rtype: int
-        """
-        logger.debug('Querying for newest timestamp in table %s',
-                    table_name)
-        q = "SELECT TIMESTAMP_TO_SEC(MAX(timestamp)) AS max_ts %s;" % (
-            self._from_for_table(table_name))
-        res = self._run_query(q)
-        ts = int(res[0]['max_ts'])
-        logger.debug('Newest timestamp in table %s: %s', table_name, ts)
-        return ts
-
     def query_one_table(self, table_name):
         """
         Run all queries for the given table name (date) and update the cache.
@@ -294,10 +294,13 @@ Resource-class.html>`_
                     table_date.strftime('%Y-%m-%d'))
         final = self._dict_for_projects()
         data_timestamp = self._get_newest_ts_in_table(table_name)
-        # query by version
-        tmp = self._query_by_version(table_name)
-        for proj_name in tmp:
-            final[proj_name]['by_version'] = tmp[proj_name]
+        # data queries
+        for name, func in {
+            'by_version': self._query_by_version,
+        }.items():
+            tmp = func(table_name)
+            for proj_name in tmp:
+                final[proj_name][name] = tmp[proj_name]
         # add to cache
         for proj_name in final:
             self.cache.set(proj_name, table_date, final[proj_name],
