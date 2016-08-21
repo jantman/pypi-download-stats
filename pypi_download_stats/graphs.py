@@ -94,9 +94,6 @@ class FancyAreaGraph(object):
         :rtype: tuple
         """
         logger.debug('Generating graph for %s', self._graph_id)
-        # @TODO - fix this, make responsive
-        defaults.width = 500
-        defaults.height = 400
         # tools to use
         tools = [
             PanTool(),
@@ -112,9 +109,10 @@ class FancyAreaGraph(object):
                  title=self._title, legend="top_left", stack=True,
                  xlabel='Date', ylabel='Downloads', tools=tools,
                  # height and width are just used to set the aspect ratio
-                 #   when responsive is specified.
-                 plot_height=400, plot_width=500, responsive=True
+                 #   when sizing_mode is specified
+                 plot_height=400, plot_width=800, sizing_mode='scale_both'
                  )
+        g.legend.orientation = 'horizontal'
 
         lines = []
         # add a line at the top of each Patch (stacked area) for hovertool
