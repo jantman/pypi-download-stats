@@ -33,7 +33,6 @@
         }
         .graphcontainer {
             overflow: auto;
-            height: 50vh;
         }
         .datadiv {
             display: none;
@@ -68,17 +67,28 @@
     </style>
 
     <script type="text/javascript">
+    /*!
+     * verge 1.9.1+201402130803
+     * https://github.com/ryanve/verge
+     * MIT License 2013 Ryan Van Etten
+     *
+     * Obtained from: https://github.com/ryanve/verge/blob/1.9.1/verge.min.js
+     */
+    !function(a,b,c){"undefined"!=typeof module&&module.exports?module.exports=c():a[b]=c()}(this,"verge",function(){function a(){return{width:k(),height:l()}}function b(a,b){var c={};return b=+b||0,c.width=(c.right=a.right+b)-(c.left=a.left-b),c.height=(c.bottom=a.bottom+b)-(c.top=a.top-b),c}function c(a,c){return a=a&&!a.nodeType?a[0]:a,a&&1===a.nodeType?b(a.getBoundingClientRect(),c):!1}function d(b){b=null==b?a():1===b.nodeType?c(b):b;var d=b.height,e=b.width;return d="function"==typeof d?d.call(b):d,e="function"==typeof e?e.call(b):e,e/d}var e={},f="undefined"!=typeof window&&window,g="undefined"!=typeof document&&document,h=g&&g.documentElement,i=f.matchMedia||f.msMatchMedia,j=i?function(a){return!!i.call(f,a).matches}:function(){return!1},k=e.viewportW=function(){var a=h.clientWidth,b=f.innerWidth;return b>a?b:a},l=e.viewportH=function(){var a=h.clientHeight,b=f.innerHeight;return b>a?b:a};return e.mq=j,e.matchMedia=i?function(){return i.apply(f,arguments)}:function(){return{}},e.viewport=a,e.scrollX=function(){return f.pageXOffset||h.scrollLeft},e.scrollY=function(){return f.pageYOffset||h.scrollTop},e.rectangle=c,e.aspect=d,e.inX=function(a,b){var d=c(a,b);return!!d&&d.right>=0&&d.left<=k()},e.inY=function(a,b){var d=c(a,b);return!!d&&d.bottom>=0&&d.top<=l()},e.inViewport=function(a,b){var d=c(a,b);return!!d&&d.bottom>=0&&d.right>=0&&d.top<=l()&&d.left<=k()},e});
+    </script>
+
+    <script type="text/javascript">
+        /*
+         * Toggle shown/hidden state of all graph divs.
+         */
         function toggleAll() {
             var togglespan = document.getElementById("toggleall");
-            console.log("togglespan.innerHtml=" + togglespan.innerHTML);
             var force_state = 1;
             if ( !togglespan.innerHTML || togglespan.innerHTML == "(hide all)" ) {
                 togglespan.innerHTML = "(show all)";
-                console.log("set togglespan.innerHtml to (show all)");
                 force_state = 2;
             } else {
                 togglespan.innerHTML = "(hide all)";
-                console.log("set togglespan.innerHtml to (hide all)");
                 force_state = 1;
             }
             var divsToHide = document.getElementsByClassName("graphdiv");
@@ -88,6 +98,9 @@
             }
         }
 
+        /*
+         * Toggle shown/hidden state of one graph div.
+         */
         function toggleGraphDiv(graphid, force_state) {
             console.log("toggleGraphDiv(" + graphid + ", " + force_state + ")");
             var div = document.getElementById("graph_" + graphid);
@@ -109,6 +122,9 @@
             togglelink.innerHTML = ihtml;
         }
 
+        /*
+         * Toggle shown/hidden state of one data table div.
+         */
         function toggleTableDiv(graphid) {
             var div = document.getElementById("data_" + graphid);
             var ihtml = "";
@@ -121,6 +137,66 @@
             }
             var togglelink = document.getElementById("toggletable_" + graphid);
             togglelink.innerHTML = ihtml;
+        }
+
+        /*
+         * Resize all graphs to be our desired size - 1/2 the viewport height
+         *  and less than the viewport width. This is an AWFUL hack.
+         */
+        function resizeGraphs(evt) {
+            // loop through all charts on page
+            for (var i in Bokeh.index) {
+                if (Bokeh.index.hasOwnProperty(i)) {
+                    // get the chart's child views
+                    var child_views = Bokeh.index[i].child_views;
+                    // for each chart, loop through the child views
+                    for (var x in child_views) {
+                        if (child_views.hasOwnProperty(x)) {
+                            // only act on the PlotCanvasView children
+                            if (x.toString().substring(0, 11) == "PlotCanvas-") {
+                                // update dimensions - (width, height)
+                                dims = scaleGraphForWindow(child_views[x].canvas._height._value, child_views[x].canvas._width._value);
+                                child_views[x].update_dimensions(dims.width, dims.height);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /*
+         * Determine initial size of graphs to fit window nicely.
+         */
+        function scaleGraphForWindow(graph_h, graph_w) {
+            var viewport_w = verge.viewportW();
+            var viewport_h = verge.viewportH();
+            // height-based scaling
+            var scalefactor = (viewport_h / 2.0) / graph_h;
+            // check if we need width-based scaling too
+            var max_width = viewport_w * 0.9; // 90% of viewport width
+            if (new_w >= max_width) {
+                // if the graph width is more than 90% of the viewport width,
+                // scale the graph by width
+                scalefactor = max_width / new_w;
+            }
+            var new_w = graph_w * scalefactor;
+            var new_h = viewport_h / 2.0;
+            return {height: new_h, width: new_w};
+        }
+
+        if(window.attachEvent) {
+            window.attachEvent('onload', resizeGraphs);
+        } else {
+            if(window.onload) {
+                var curronload = window.onload;
+                var newonload = function(evt) {
+                    curronload(evt);
+                    resizeGraphs(evt);
+                };
+                window.onload = newonload;
+            } else {
+                window.onload = resizeGraphs;
+            }
         }
     </script>
     {{ resources }}

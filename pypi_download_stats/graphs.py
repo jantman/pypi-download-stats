@@ -108,9 +108,8 @@ class FancyAreaGraph(object):
         g = Area(self._data, x='Date', y=self._y_series_names,
                  title=self._title, legend="top_left", stack=True,
                  xlabel='Date', ylabel='Downloads', tools=tools,
-                 # height and width are just used to set the aspect ratio
-                 #   when sizing_mode is specified
-                 plot_height=400, plot_width=800, sizing_mode='scale_both'
+                 # note the width and height will be set by JavaScript
+                 plot_height=400, plot_width=800
                  )
         g.legend.orientation = 'horizontal'
 
