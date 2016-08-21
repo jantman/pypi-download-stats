@@ -110,7 +110,11 @@ class FancyAreaGraph(object):
         # generate the stacked area graph
         g = Area(self._data, x='Date', y=self._y_series_names,
                  title=self._title, legend="top_left", stack=True,
-                 xlabel='Date', ylabel='Downloads', tools=tools)
+                 xlabel='Date', ylabel='Downloads', tools=tools,
+                 # height and width are just used to set the aspect ratio
+                 #   when responsive is specified.
+                 plot_height=400, plot_width=500, responsive=True
+                 )
 
         lines = []
         # add a line at the top of each Patch (stacked area) for hovertool
