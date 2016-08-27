@@ -282,6 +282,199 @@ Resource-class.html>`_
                 row['dl_count'])
         return result
 
+    def _query_by_file_type(self, table_name):
+        """
+        Query for download data broken down by file type, for one day.
+
+        :param table_name:
+        :type table_name:
+        :return: dict of download information by file type; keys are project
+          name, values are a dict of file type to download count
+        :rtype: dict
+        """
+        logger.info('Querying for downloads by file type in table %s',
+                    table_name)
+        q = "SELECT file.project, file.type, COUNT(*) as dl_count " \
+            "%s " \
+            "%s " \
+            "GROUP BY file.project, file.type;" % (
+            self._from_for_table(table_name),
+            self._where_for_projects
+        )
+        res = self._run_query(q)
+        result = self._dict_for_projects()
+        for row in res:
+            result[row['file_project']][row['file_type']] = int(
+                row['dl_count'])
+        return result
+
+    def _query_by_installer(self, table_name):
+        """
+        Query for download data broken down by installer, for one day.
+
+        :param table_name:
+        :type table_name:
+        :return: dict of download information by installer; keys are project
+          name, values are a dict of installer names to dicts of installer
+          version to download count.
+        :rtype: dict
+        """
+        logger.info('Querying for downloads by installer in table %s',
+                    table_name)
+        q = "SELECT file.project, details.installer.name, " \
+            "details.installer.version, COUNT(*) as dl_count " \
+            "%s " \
+            "%s " \
+            "GROUP BY file.project, details.installer.name, " \
+            "details.installer.version;" % (
+            self._from_for_table(table_name),
+            self._where_for_projects
+        )
+        res = self._run_query(q)
+        result = self._dict_for_projects()
+        # iterate through results
+        for row in res:
+            # pointer to the per-project result dict
+            proj = result[row['file_project']]
+            # grab the name and version; change None to 'unknown'
+            iname = row['details_installer_name']
+            iver = row['details_installer_version']
+            if iname not in proj:
+                proj[iname] = {}
+            if iver not in proj[iname]:
+                proj[iname][iver] = 0
+            proj[iname][iver] += int(row['dl_count'])
+        return result
+
+    def _query_by_implementation(self, table_name):
+        """
+        Query for download data broken down by Python implementation, for one
+        day.
+
+        :param table_name:
+        :type table_name:
+        :return: dict of download information by implementation; keys are
+          project name, values are a dict of implementation names to dicts of
+          implementation version to download count.
+        :rtype: dict
+        """
+        logger.info('Querying for downloads by Python implementation in table '
+                    '%s', table_name)
+        q = "SELECT file.project, details.implementation.name, " \
+            "details.implementation.version, COUNT(*) as dl_count " \
+            "%s " \
+            "%s " \
+            "GROUP BY file.project, details.implementation.name, " \
+            "details.implementation.version;" % (
+            self._from_for_table(table_name),
+            self._where_for_projects
+        )
+        res = self._run_query(q)
+        result = self._dict_for_projects()
+        # iterate through results
+        for row in res:
+            # pointer to the per-project result dict
+            proj = result[row['file_project']]
+            # grab the name and version; change None to 'unknown'
+            iname = row['details_implementation_name']
+            iver = row['details_implementation_version']
+            if iname not in proj:
+                proj[iname] = {}
+            if iver not in proj[iname]:
+                proj[iname][iver] = 0
+            proj[iname][iver] += int(row['dl_count'])
+        return result
+
+    def _query_by_system(self, table_name):
+        """
+        Query for download data broken down by system, for one day.
+
+        :param table_name:
+        :type table_name:
+        :return: dict of download information by system; keys are project name,
+          values are a dict of system names to download count.
+        :rtype: dict
+        """
+        logger.info('Querying for downloads by system in table %s',
+                    table_name)
+        q = "SELECT file.project, details.system.name, COUNT(*) as dl_count " \
+            "%s " \
+            "%s " \
+            "GROUP BY file.project, details.system.name;" % (
+            self._from_for_table(table_name),
+            self._where_for_projects
+        )
+        res = self._run_query(q)
+        result = self._dict_for_projects()
+        for row in res:
+            system = row['details_system_name']
+            result[row['file_project']][system] = int(
+                row['dl_count'])
+        return result
+
+    def _query_by_distro(self, table_name):
+        """
+        Query for download data broken down by OS distribution, for one day.
+
+        :param table_name:
+        :type table_name:
+        :return: dict of download information by distro; keys are project name,
+          values are a dict of distro names to dicts of distro version to
+          download count.
+        :rtype: dict
+        """
+        logger.info('Querying for downloads by distro in table %s', table_name)
+        q = "SELECT file.project, details.distro.name, " \
+            "details.distro.version, COUNT(*) as dl_count " \
+            "%s " \
+            "%s " \
+            "GROUP BY file.project, details.distro.name, " \
+            "details.distro.version;" % (
+            self._from_for_table(table_name),
+            self._where_for_projects
+        )
+        res = self._run_query(q)
+        result = self._dict_for_projects()
+        # iterate through results
+        for row in res:
+            # pointer to the per-project result dict
+            proj = result[row['file_project']]
+            # grab the name and version; change None to 'unknown'
+            dname = row['details_distro_name']
+            dver = row['details_distro_version']
+            if dname not in proj:
+                proj[dname] = {}
+            if dver not in proj[dname]:
+                proj[dname][dver] = 0
+            proj[dname][dver] += int(row['dl_count'])
+        return result
+
+    def _query_by_country_code(self, table_name):
+        """
+        Query for download data broken down by country code, for one day.
+
+        :param table_name:
+        :type table_name:
+        :return: dict of download information by country code; keys are project
+          name, values are a dict of country code to download count.
+        :rtype: dict
+        """
+        logger.info('Querying for downloads by country code in table %s',
+                    table_name)
+        q = "SELECT file.project, country_code, COUNT(*) as dl_count " \
+            "%s " \
+            "%s " \
+            "GROUP BY file.project, country_code;" % (
+            self._from_for_table(table_name),
+            self._where_for_projects
+        )
+        res = self._run_query(q)
+        result = self._dict_for_projects()
+        for row in res:
+            result[row['file_project']][row['country_code']] = int(
+                row['dl_count'])
+        return result
+
     def query_one_table(self, table_name):
         """
         Run all queries for the given table name (date) and update the cache.
@@ -297,6 +490,12 @@ Resource-class.html>`_
         # data queries
         for name, func in {
             'by_version': self._query_by_version,
+            'by_file_type': self._query_by_file_type,
+            'by_installer': self._query_by_installer,
+            'by_implementation': self._query_by_implementation,
+            'by_system': self._query_by_system,
+            'by_distro': self._query_by_distro,
+            'by_country': self._query_by_country_code
         }.items():
             tmp = func(table_name)
             for proj_name in tmp:
