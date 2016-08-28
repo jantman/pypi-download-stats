@@ -40,6 +40,7 @@ from datetime import datetime
 from pytz import utc
 from tzlocal import get_localzone
 from iso3166 import countries
+from math import ceil
 
 logger = logging.getLogger(__name__)
 
@@ -254,3 +255,78 @@ class ProjectStats(object):
                     k = self._compound_column_value(distro_name, distro_ver)
                     ret[cache_date][k] = count
         return ret
+
+    @property
+    def downloads_per_day(self):
+        """
+        Return the number of downloads per day, averaged over the past 7 days
+        of data.
+
+        :return: average number of downloads per day
+        :rtype: int
+        """
+        count, num_days = self._downloads_for_num_days(7)
+        res = ceil(count / num_days)
+        logger.debug("Downloads per day = (%d / %d) = %d", count, num_days, res)
+        return res
+
+    @property
+    def downloads_per_week(self):
+        """
+        Return the number of downloads in the last 7 days.
+
+        :return: number of downloads in the last 7 days; if we have less than
+          7 days of data, returns None.
+        :rtype: int
+        """
+        if len(self.cache_dates) < 7:
+            logger.error("Only have %d days of data; cannot calculate "
+                         "downloads per week", len(self.cache_dates))
+            return None
+        count, _ = self._downloads_for_num_days(7)
+        logger.debug("Downloads per week = %d", count)
+        return count
+
+    @property
+    def downloads_per_month(self):
+        """
+        Return the number of downloads in the last 30 days.
+
+        Uses :py:meth:`~._downloads_for_num_days` to retrieve the data.
+
+        :return: number of downloads in the last 30 days; if we have less than
+          30 days of data, returns None.
+        :rtype: int
+        """
+        if len(self.cache_dates) < 30:
+            logger.error("Only have %d days of data; cannot calculate "
+                         "downloads per month", len(self.cache_dates))
+            return None
+        count, _ = self._downloads_for_num_days(30)
+        logger.debug("Downloads per month = %d", count)
+        return count
+
+    def _downloads_for_num_days(self, num_days):
+        """
+        Given a number of days of historical data to look at (starting with
+        today and working backwards), return the total number of downloads
+        for that time range, and the number of days of data we had (in cases
+        where we had less data than requested).
+
+        :param num_days: number of days of data to look at
+        :type num_days: int
+        :return: 2-tuple of (download total, number of days of data)
+        :rtype: tuple
+        """
+        logger.debug("Getting download total for last %d days", num_days)
+        dates = self.cache_dates
+        logger.debug("Cache has %d days of data", len(dates))
+        if len(dates) > num_days:
+            dates = dates [(-1 * num_days):]
+        logger.debug("Looking at last %d days of data", len(dates))
+        dl_sum = 0
+        for cache_date in dates:
+            data = self._cache_get(cache_date)
+            dl_sum += sum(data['by_version'].values())
+        logger.debug("Sum of download counts: %d", dl_sum)
+        return dl_sum, len(dates)

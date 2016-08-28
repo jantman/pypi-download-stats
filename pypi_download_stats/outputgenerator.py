@@ -40,6 +40,7 @@ import os
 import shutil
 from platform import node as platform_node
 from getpass import getuser
+import requests
 
 from jinja2 import Environment, PackageLoader
 from bokeh.resources import Resources
@@ -87,6 +88,7 @@ class OutputGenerator(object):
                      self.output_dir)
         os.makedirs(self.output_dir)
         self._graphs = {}
+        self._badges = {}
 
     def _generate_html(self):
         """
@@ -114,7 +116,8 @@ class OutputGenerator(object):
             proj_url=PROJECT_URL,
             graphs=self._graphs,
             graph_keys=self.GRAPH_KEYS,
-            resources=Resources(mode='inline').render()
+            resources=Resources(mode='inline').render(),
+            badges=self._badges
         )
         logger.debug('Template rendered')
         return html
@@ -177,6 +180,47 @@ class OutputGenerator(object):
             'raw_data': stats_data
         }
 
+    def _generate_badges(self):
+        """
+        Generate download badges. Append them to ``self._badges``.
+        """
+        daycount = self._stats.downloads_per_day
+        day = self._generate_badge('Downloads', '%d/day' % daycount)
+        self._badges['per-day'] = day
+        weekcount = self._stats.downloads_per_week
+        if weekcount is None:
+            # we don't have enough data for week (or month)
+            return
+        week = self._generate_badge('Downloads', '%d/week' % weekcount)
+        self._badges['per-week'] = week
+        monthcount = self._stats.downloads_per_month
+        if monthcount is None:
+            # we don't have enough data for month
+            return
+        month = self._generate_badge('Downloads', '%d/month' % monthcount)
+        self._badges['per-month'] = month
+
+    def _generate_badge(self, subject, status):
+        """
+        Generate SVG for one badge via shields.io.
+
+        :param subject: subject; left-hand side of badge
+        :type subject: str
+        :param status: status; right-hand side of badge
+        :type status: str
+        :return: badge SVG
+        :rtype: str
+        """
+        url = 'https://img.shields.io/badge/%s-%s-brightgreen.svg' \
+              '?style=flat&maxAge=3600' % (subject, status)
+        logger.debug("Getting badge for %s => %s (%s)", subject, status, url)
+        res = requests.get(url)
+        if res.status_code != 200:
+            raise Exception("Error: got status %s for shields.io badge: %s",
+                            res.status_code, res.text)
+        logger.debug('Got %d response from shields.io', len(res.text))
+        return res.text
+
     def generate(self):
         """
         Generate all output types and write to disk.
@@ -224,12 +268,19 @@ class OutputGenerator(object):
             self._stats.per_distro_data,
             'Distro'
         )
+        self._generate_badges()
         logger.info('Generating HTML')
         html = self._generate_html()
         html_path = os.path.join(self.output_dir, 'index.html')
         with open(html_path, 'w') as fh:
             fh.write(html)
         logger.info('HTML report written to %s', html_path)
+        logger.info('Writing SVG badges')
+        for name, svg in self._badges.items():
+            path = os.path.join(self.output_dir, '%s.svg' % name)
+            with open(path, 'w') as fh:
+                fh.write(svg)
+            logger.info('%s badge written to: %s', name, path)
 
 
 def filter_format_date_long(dt):

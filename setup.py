@@ -47,7 +47,8 @@ requires = [
     'bokeh==0.12.1',
     'tzlocal',
     'pytz',
-    'iso3166'
+    'iso3166',
+    'requests>2.0,<3.0'
 ]
 
 classifiers = [
