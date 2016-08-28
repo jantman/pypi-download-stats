@@ -133,6 +133,22 @@ class ProjectStats(object):
             return 'unknown'
         return '%s %s' % (k1, k2)
 
+    @staticmethod
+    def _shorten_version(ver, num_components=2):
+        """
+        If ``ver`` is a dot-separated string with at least (num_components +1)
+        components, return only the first two. Else return the original string.
+
+        :param ver: version string
+        :type ver: str
+        :return: shortened (major, minor) version
+        :rtype: str
+        """
+        parts = ver.split('.')
+        if len(parts) <= num_components:
+            return ver
+        return '.'.join(parts[:num_components])
+
     @property
     def per_version_data(self):
         """
@@ -178,7 +194,10 @@ class ProjectStats(object):
             ret[cache_date] = {}
             for inst_name, inst_data in data['by_installer'].items():
                 for inst_ver, count in inst_data.items():
-                    k = self._compound_column_value(inst_name, inst_ver)
+                    k = self._compound_column_value(
+                        inst_name,
+                        self._shorten_version(inst_ver)
+                    )
                     ret[cache_date][k] = count
         return ret
 
@@ -197,7 +216,10 @@ class ProjectStats(object):
             ret[cache_date] = {}
             for impl_name, impl_data in data['by_implementation'].items():
                 for impl_ver, count in impl_data.items():
-                    k = self._compound_column_value(impl_name, impl_ver)
+                    k = self._compound_column_value(
+                        impl_name,
+                        self._shorten_version(impl_ver)
+                    )
                     ret[cache_date][k] = count
         return ret
 
@@ -254,7 +276,11 @@ class ProjectStats(object):
                 if distro_name.lower() == 'red hat enterprise linux server':
                     distro_name = 'RHEL'
                 for distro_ver, count in distro_data.items():
-                    k = self._compound_column_value(distro_name, distro_ver)
+                    ver = self._shorten_version(distro_ver, num_components=1)
+                    if distro_name.lower() == 'os x':
+                        ver = self._shorten_version(distro_ver,
+                                                    num_components=2)
+                    k = self._compound_column_value(distro_name, ver)
                     ret[cache_date][k] = count
         return ret
 
