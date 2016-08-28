@@ -106,14 +106,15 @@ class FancyAreaGraph(object):
 
         # generate the stacked area graph
         g = Area(self._data, x='Date', y=self._y_series_names,
-                 title=self._title, legend="top_left", stack=True,
-                 xlabel='Date', ylabel='Downloads', tools=tools,
+                 title=self._title, stack=True, xlabel='Date',
+                 ylabel='Downloads', tools=tools,
                  # note the width and height will be set by JavaScript
-                 plot_height=400, plot_width=800
-                 )
-        g.legend.orientation = 'horizontal'
+                 plot_height=400, plot_width=800,
+                 toolbar_location='above', legend=False
+        )
 
         lines = []
+        legend_parts = []
         # add a line at the top of each Patch (stacked area) for hovertool
         for renderer in g.select(GlyphRenderer):
             if not isinstance(renderer.glyph, Patches):
@@ -124,6 +125,7 @@ class FancyAreaGraph(object):
             line = self._line_for_patches(self._data, g, renderer, series_name)
             if line is not None:
                 lines.append(line)
+                legend_parts.append((series_name, [line]))
 
         # add the Hovertool, specifying only our line glyphs
         g.add_tools(
@@ -137,6 +139,10 @@ class FancyAreaGraph(object):
                 line_policy='nearest'
             )
         )
+
+        # legend outside chart area
+        legend = Legend(legends=legend_parts, location=(0, 0))
+        g.add_layout(legend, 'right')
         return components(g)
 
     def _line_for_patches(self, data, chart, renderer, series_name):
