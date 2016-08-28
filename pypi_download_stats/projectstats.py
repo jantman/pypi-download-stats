@@ -112,9 +112,25 @@ class ProjectStats(object):
         :return: field value we cache/display
         :rtype: str
         """
-        if orig_val is None:
+        if orig_val is None or orig_val == 'null':
             return 'unknown'
         return orig_val
+
+    @staticmethod
+    def _compound_column_value(k1, k2):
+        """
+        Like :py:meth:`~._column_value` but collapses two unknowns into one.
+
+        :param k1: first (top-level) value
+        :param k2: second (bottom-level) value
+        :return: display key
+        :rtype: str
+        """
+        k1 = ProjectStats._column_value(k1)
+        k2 = ProjectStats._column_value(k2)
+        if k1 == 'unknown' and k2 == 'unknown':
+            return 'unknown'
+        return '%s %s' % (k1, k2)
 
     @property
     def per_version_data(self):
@@ -161,10 +177,7 @@ class ProjectStats(object):
             ret[cache_date] = {}
             for inst_name, inst_data in data['by_installer'].items():
                 for inst_ver, count in inst_data.items():
-                    k = '%s %s' % (
-                        self._column_value(inst_name),
-                        self._column_value(inst_ver)
-                    )
+                    k = self._compound_column_value(inst_name, inst_ver)
                     ret[cache_date][k] = count
         return ret
 
@@ -183,10 +196,7 @@ class ProjectStats(object):
             ret[cache_date] = {}
             for impl_name, impl_data in data['by_implementation'].items():
                 for impl_ver, count in impl_data.items():
-                    k = '%s %s' % (
-                        self._column_value(impl_name),
-                        self._column_value(impl_ver)
-                    )
+                    k = self._compound_column_value(impl_name, impl_ver)
                     ret[cache_date][k] = count
         return ret
 
@@ -241,9 +251,6 @@ class ProjectStats(object):
             ret[cache_date] = {}
             for distro_name, distro_data in data['by_distro'].items():
                 for distro_ver, count in distro_data.items():
-                    k = '%s %s' % (
-                        self._column_value(distro_name),
-                        self._column_value(distro_ver)
-                    )
+                    k = self._compound_column_value(distro_name, distro_ver)
                     ret[cache_date][k] = count
         return ret

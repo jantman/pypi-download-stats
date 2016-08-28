@@ -54,7 +54,13 @@ class OutputGenerator(object):
 
     # this list defines the order in which graphs will show up on the page
     GRAPH_KEYS = [
-        'by-version'
+        'by-version',
+        'by-file-type',
+        'by-installer',
+        'by-implementation',
+        'by-system',
+        'by-country',
+        'by-distro'
     ]
 
     def __init__(self, project_name, stats, output_dir):
@@ -144,25 +150,31 @@ class OutputGenerator(object):
                     out_data[k].append(0)
         return out_data, labels
 
-    def _generate_by_version(self):
+    def _generate_graph(self, name, title, stats_data, y_name):
         """
-        Generate the graph of downloads by version; append it to
-        ``self._graphs``.
+        Generate a downloads graph; append it to ``self._graphs``.
+
+        :param name: HTML name of the graph, also used in ``self.GRAPH_KEYS``
+        :type name: str
+        :param title: human-readable title for the graph
+        :type title: str
+        :param stats_data: data dict from ``self._stats``
+        :type stats_data: dict
+        :param y_name: Y axis metric name
+        :type y_name: str
         """
-        logger.debug('Generating chart data for by-version graph')
-        data, labels = self._data_dict_to_bokeh_chart_data(
-            self._stats.per_version_data)
-        logger.debug('Generating by-version graph')
-        title = 'Downloads by Version'
+        logger.debug('Generating chart data for %s graph', name)
+        data, labels = self._data_dict_to_bokeh_chart_data(stats_data)
+        logger.debug('Generating %s graph', name)
         script, div = FancyAreaGraph(
-            'by-version', '%s %s' % (self.project_name, title), data, labels,
-            'Version').generate_graph()
-        logger.debug('by-version graph generated')
-        self._graphs['by-version'] = {
+            name, '%s %s' % (self.project_name, title), data, labels,
+            y_name).generate_graph()
+        logger.debug('%s graph generated', name)
+        self._graphs[name] = {
             'title': title,
             'script': script,
             'div': div,
-            'raw_data': self._stats.per_version_data
+            'raw_data': stats_data
         }
 
     def generate(self):
@@ -170,7 +182,48 @@ class OutputGenerator(object):
         Generate all output types and write to disk.
         """
         logger.info('Generating graphs')
-        self._generate_by_version()
+        self._generate_graph(
+            'by-version',
+            'Downloads by Version',
+            self._stats.per_version_data,
+            'Version'
+        )
+        self._generate_graph(
+            'by-file-type',
+            'Downloads by File Type',
+            self._stats.per_file_type_data,
+            'File Type'
+        )
+        self._generate_graph(
+            'by-installer',
+            'Downloads by Installer',
+            self._stats.per_installer_data,
+            'Installer'
+        )
+        self._generate_graph(
+            'by-implementation',
+            'Downloads by Python Implementation/Version',
+            self._stats.per_implementation_data,
+            'Implementation/Version'
+        )
+        self._generate_graph(
+            'by-system',
+            'Downloads by System Type',
+            self._stats.per_system_data,
+            'System'
+        )
+        self._generate_graph(
+            'by-country',
+            'Downloads by Country',
+            self._stats.per_country_data,
+            'Country'
+        )
+        self._generate_graph(
+            'by-distro',
+            'Downloads by Distro',
+            self._stats.per_distro_data,
+            'Distro'
+        )
         logger.info('Generating HTML')
         html = self._generate_html()
         html_path = os.path.join(self.output_dir, 'index.html')
