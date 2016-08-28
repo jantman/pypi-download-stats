@@ -189,8 +189,8 @@ Resource-class.html>`_
 
         :param query: the query to run
         :type query: str
-        :return:
-        :rtype:
+        :return: list of per-row response dicts (key => value)
+        :rtype: list
         """
         query_request = self.service.jobs()
         logger.debug('Running query: %s', query)
@@ -202,6 +202,8 @@ Resource-class.html>`_
         logger.debug('Query response (in %s): %s', duration, resp)
         if not resp['jobComplete']:
             logger.error('Error: query reported job not complete!')
+        if int(resp['totalRows']) == 0:
+            return []
         if int(resp['totalRows']) != len(resp['rows']):
             logger.error('Error: query reported %s total rows, but only '
                          'returned %d', resp['totalRows'], len(resp['rows']))
@@ -486,7 +488,18 @@ Resource-class.html>`_
         logger.info('Running all queries for date table: %s (%s)', table_name,
                     table_date.strftime('%Y-%m-%d'))
         final = self._dict_for_projects()
-        data_timestamp = self._get_newest_ts_in_table(table_name)
+        try:
+            data_timestamp = self._get_newest_ts_in_table(table_name)
+        except HttpError as exc:
+            try:
+                content = json.loads(exc.content.decode('utf-8'))
+                if content['error']['message'].startswith('Not found: Table'):
+                    logger.error("Table %s not found; no data for that day",
+                                 table_name)
+                    return
+            except:
+                pass
+            raise exc
         # data queries
         for name, func in {
             'by_version': self._query_by_version,
