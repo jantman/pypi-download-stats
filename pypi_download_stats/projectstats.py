@@ -39,6 +39,7 @@ import logging
 from datetime import datetime
 from pytz import utc
 from tzlocal import get_localzone
+from iso3166 import countries
 
 logger = logging.getLogger(__name__)
 
@@ -82,10 +83,43 @@ class ProjectStats(object):
         self.cache_data[date] = data
         return data
 
+    @staticmethod
+    def _alpha2_to_country(alpha2):
+        """
+        Try to look up an alpha2 country code from the iso3166 package; return
+        the returned name if available, otherwise the original value. Returns
+        "unknown" (str) for None.
+
+        :param alpha2: alpha2 country code
+        :type alpha2: str
+        :return: country name, or original value if not found
+        :rtype: str
+        """
+        if alpha2 is None:
+            return 'unknown'
+        try:
+            return countries.get(alpha2).name
+        except KeyError:
+            return alpha2
+
+    @staticmethod
+    def _column_value(orig_val):
+        """
+        Munge a BigQuery column value to what we want to store; currently
+        just turns ``None``s into the String "unknown".
+
+        :param orig_val: original field value
+        :return: field value we cache/display
+        :rtype: str
+        """
+        if orig_val is None:
+            return 'unknown'
+        return orig_val
+
     @property
     def per_version_data(self):
         """
-        Return download data by version for num_days
+        Return download data by version.
 
         :return: dict of cache data; keys are datetime objects, values are
           dict of version (str) to count (int)
@@ -95,4 +129,121 @@ class ProjectStats(object):
         for cache_date in self.cache_dates:
             data = self._cache_get(cache_date)
             ret[cache_date] = data['by_version']
+        return ret
+
+    @property
+    def per_file_type_data(self):
+        """
+        Return download data by file type.
+
+        :return: dict of cache data; keys are datetime objects, values are
+          dict of file type (str) to count (int)
+        :rtype: dict
+        """
+        ret = {}
+        for cache_date in self.cache_dates:
+            data = self._cache_get(cache_date)
+            ret[cache_date] = data['by_file_type']
+        return ret
+
+    @property
+    def per_installer_data(self):
+        """
+        Return download data by installer name and version.
+
+        :return: dict of cache data; keys are datetime objects, values are
+          dict of installer name/version (str) to count (int).
+        :rtype: dict
+        """
+        ret = {}
+        for cache_date in self.cache_dates:
+            data = self._cache_get(cache_date)
+            ret[cache_date] = {}
+            for inst_name, inst_data in data['by_installer'].items():
+                for inst_ver, count in inst_data.items():
+                    k = '%s %s' % (
+                        self._column_value(inst_name),
+                        self._column_value(inst_ver)
+                    )
+                    ret[cache_date][k] = count
+        return ret
+
+    @property
+    def per_implementation_data(self):
+        """
+        Return download data by python impelementation name and version.
+
+        :return: dict of cache data; keys are datetime objects, values are
+          dict of implementation name/version (str) to count (int).
+        :rtype: dict
+        """
+        ret = {}
+        for cache_date in self.cache_dates:
+            data = self._cache_get(cache_date)
+            ret[cache_date] = {}
+            for impl_name, impl_data in data['by_implementation'].items():
+                for impl_ver, count in impl_data.items():
+                    k = '%s %s' % (
+                        self._column_value(impl_name),
+                        self._column_value(impl_ver)
+                    )
+                    ret[cache_date][k] = count
+        return ret
+
+    @property
+    def per_system_data(self):
+        """
+        Return download data by system.
+
+        :return: dict of cache data; keys are datetime objects, values are
+          dict of system (str) to count (int)
+        :rtype: dict
+        """
+        ret = {}
+        for cache_date in self.cache_dates:
+            data = self._cache_get(cache_date)
+            ret[cache_date] = {
+                self._column_value(x): data['by_system'][x]
+                for x in data['by_system']
+            }
+        return ret
+
+    @property
+    def per_country_data(self):
+        """
+        Return download data by country.
+
+        :return: dict of cache data; keys are datetime objects, values are
+          dict of country (str) to count (int)
+        :rtype: dict
+        """
+        ret = {}
+        for cache_date in self.cache_dates:
+            data = self._cache_get(cache_date)
+            ret[cache_date] = {}
+            for cc, count in data['by_country'].items():
+                k = '%s (%s)' % (self._alpha2_to_country(cc), cc)
+                ret[cache_date][k] = count
+        return ret
+
+    @property
+    def per_distro_data(self):
+        """
+        Return download data by distro name and version.
+
+        :return: dict of cache data; keys are datetime objects, values are
+          dict of distro name/version (str) to count (int).
+        :rtype: dict
+        """
+        ret = {}
+        for cache_date in self.cache_dates:
+            data = self._cache_get(cache_date)
+            ret[cache_date] = {}
+            for distro_name, distro_data in data['by_distro'].items():
+                for distro_ver, count in distro_data.items():
+                    k = '%s %s' % (
+                        self._column_value(distro_name),
+                        self._column_value(distro_ver)
+                    )
+                    ret[cache_date][k] = count
         return ret
