@@ -46,7 +46,8 @@ requires = [
     'oauth2client>=3.0.0',
     'bokeh==0.12.1',
     'tzlocal',
-    'pytz'
+    'pytz',
+    'iso3166'
 ]
 
 classifiers = [
