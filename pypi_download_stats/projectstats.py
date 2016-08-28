@@ -251,6 +251,8 @@ class ProjectStats(object):
             data = self._cache_get(cache_date)
             ret[cache_date] = {}
             for distro_name, distro_data in data['by_distro'].items():
+                if distro_name.lower() == 'red hat enterprise linux server':
+                    distro_name = 'RHEL'
                 for distro_ver, count in distro_data.items():
                     k = self._compound_column_value(distro_name, distro_ver)
                     ret[cache_date][k] = count
