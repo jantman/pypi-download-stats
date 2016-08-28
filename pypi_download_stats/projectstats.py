@@ -36,7 +36,7 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 """
 
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from pytz import utc
 from tzlocal import get_localzone
 from iso3166 import countries
@@ -58,12 +58,38 @@ class ProjectStats(object):
         logger.debug('Initializing ProjectStats for project: %s', project_name)
         self.project_name = project_name
         self.cache = cache_instance
-        self.cache_dates = self.cache.get_dates_for_project(project_name)
+        self.cache_dates = self._get_cache_dates()
         self.cache_data = {}
         self.as_of_timestamp = self._cache_get(
             self.cache_dates[-1])['cache_metadata']['data_ts']
         self.as_of_datetime = datetime.fromtimestamp(
             self.as_of_timestamp, utc).astimezone(get_localzone())
+
+    def _get_cache_dates(self):
+        """
+        Get s list of dates (:py:class:`datetime.datetime`) present in cache,
+        beginning with the longest contiguous set of dates that isn't missing
+        more than one date in series.
+
+        :return: list of datetime objects for contiguous dates in cache
+        :rtype: list
+        """
+        all_dates = self.cache.get_dates_for_project(self.project_name)
+        dates = []
+        last_date = None
+        for val in sorted(all_dates):
+            if last_date is None:
+                last_date = val
+                continue
+            if val - last_date > timedelta(hours=48):
+                # reset dates to start from here
+                logger.warning("Last cache date was %s, current date is %s; "
+                               "delta is too large. Starting cache date series "
+                               "at current date.", last_date, val)
+                dates = []
+            last_date = val
+            dates.append(val)
+        return dates
 
     def _cache_get(self, date):
         """
