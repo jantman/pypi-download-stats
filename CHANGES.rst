@@ -1,7 +1,7 @@
 Changelog
 =========
 
-x.y.z (YYYY-MM-DD)
+0.1.0 (2016-08-28)
 ------------------
 
-* something
+* Initial release
