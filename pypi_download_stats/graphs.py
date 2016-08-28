@@ -147,7 +147,7 @@ class FancyAreaGraph(object):
         :param data: original data for the graph
         :type data: dict
         :param chart: Chart to add the line to
-        :type chart: bokeh.charts.chart.Chart
+        :type chart: bokeh.charts.Chart
         :param renderer: GlyphRenderer containing one Patches glyph, to draw
           the line for
         :type renderer: bokeh.models.renderers.GlyphRenderer

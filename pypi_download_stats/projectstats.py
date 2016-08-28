@@ -107,7 +107,7 @@ class ProjectStats(object):
     def _column_value(orig_val):
         """
         Munge a BigQuery column value to what we want to store; currently
-        just turns ``None``s into the String "unknown".
+        just turns ``None`` into the String "unknown".
 
         :param orig_val: original field value
         :return: field value we cache/display

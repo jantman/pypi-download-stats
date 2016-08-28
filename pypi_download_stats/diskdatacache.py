@@ -89,7 +89,7 @@ class DiskDataCache(object):
         :param date: date to get data for
         :type date: datetime.datetime
         :return: dict of per-date data for project
-        :rtype: dict or None
+        :rtype: :py:obj:`dict` or ``None``
         """
         fpath = self._path_for_file(project, date)
         logger.debug('Cache GET project=%s date=%s - path=%s',
@@ -144,7 +144,7 @@ class DiskDataCache(object):
         :param project: project name
         :type project: str
         :return: list of datetime.datetime objects
-        :rtype: date
+        :rtype: datetime.datetime
         """
         file_re = re.compile(r'^%s_([0-9]{8})\.json$' % project)
         all_dates = []
