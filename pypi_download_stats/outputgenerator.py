@@ -260,7 +260,7 @@ class OutputGenerator(object):
         if res.status_code != 200:
             raise Exception("Error: got status %s for shields.io badge: %s",
                             res.status_code, res.text)
-        logger.debug('Got %d response from shields.io', len(res.text))
+        logger.debug('Got %d character response from shields.io', len(res.text))
         return res.text
 
     def generate(self):
