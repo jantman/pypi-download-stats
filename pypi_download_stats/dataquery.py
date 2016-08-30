@@ -501,6 +501,7 @@ Resource-class.html>`_
                 pass
             raise exc
         # data queries
+        # note - ProjectStats._is_empty_cache_record() needs to know keys
         for name, func in {
             'by_version': self._query_by_version,
             'by_file_type': self._query_by_file_type,

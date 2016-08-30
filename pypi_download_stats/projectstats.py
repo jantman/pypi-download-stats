@@ -58,8 +58,8 @@ class ProjectStats(object):
         logger.debug('Initializing ProjectStats for project: %s', project_name)
         self.project_name = project_name
         self.cache = cache_instance
-        self.cache_dates = self._get_cache_dates()
         self.cache_data = {}
+        self.cache_dates = self._get_cache_dates()
         self.as_of_timestamp = self._cache_get(
             self.cache_dates[-1])['cache_metadata']['data_ts']
         self.as_of_datetime = datetime.fromtimestamp(
@@ -89,7 +89,36 @@ class ProjectStats(object):
                 dates = []
             last_date = val
             dates.append(val)
+        # find the first download record, and only look at dates after that
+        for idx, cache_date in enumerate(dates):
+            data = self._cache_get(cache_date)
+            if not self._is_empty_cache_record(data):
+                logger.debug("First cache date with data: %s", cache_date)
+                return dates[idx:]
         return dates
+
+    def _is_empty_cache_record(self, rec):
+        """
+        Return True if the specified cache record has no data, False otherwise.
+
+        :param rec: cache record returned by :py:meth:`~._cache_get`
+        :type rec: dict
+        :return: True if record is empty, False otherwise
+        :rtype: bool
+        """
+        # these are taken from DataQuery.query_one_table()
+        for k in [
+            'by_version',
+            'by_file_type',
+            'by_installer',
+            'by_implementation',
+            'by_system',
+            'by_distro',
+            'by_country'
+        ]:
+            if k in rec and len(rec[k]) > 0:
+                return False
+        return True
 
     def _cache_get(self, date):
         """
