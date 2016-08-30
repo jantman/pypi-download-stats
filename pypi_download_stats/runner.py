@@ -40,6 +40,11 @@ import argparse
 import logging
 import os
 
+try:
+    import xmlrpclib
+except ImportError:
+    import xmlrpc.client as xmlrpclib
+
 from pypi_download_stats.dataquery import DataQuery
 from pypi_download_stats.diskdatacache import DiskDataCache
 from pypi_download_stats.outputgenerator import OutputGenerator
@@ -104,10 +109,14 @@ def parse_args(argv):
                    help='number of days of historical data to backfill, if '
                         'missing (defaut: 7). Note this may incur BigQuery '
                         'charges. Set to -1 to backfill all available history.')
-    p.add_argument('PROJECT', action='store', type=str, nargs='+',
+    g = p.add_mutually_exclusive_group()
+    g.add_argument('-P', '--project', dest='PROJECT', action='append', type=str,
                    help='project name to query/generate stats for (can be '
                         'specified more than once; '
                         'this will reduce query cost for multiple projects)')
+    g.add_argument('-U', '--user', dest='user', action='store', type=str,
+                   help='Run for all PyPI projects owned by the specified'
+                        'user.')
     args = p.parse_args(argv)
     return args
 
@@ -141,6 +150,23 @@ def set_log_level_format(level, format):
     logger.setLevel(level)
 
 
+def _pypi_get_projects_for_user(username):
+    """
+    Given the username of a PyPI user, return a list of all of the user's
+    projects from the XMLRPC interface.
+
+    See: https://wiki.python.org/moin/PyPIXmlRpc
+
+    :param username: PyPI username
+    :type username: str
+    :return: list of string project names
+    :rtype: list
+    """
+    client = xmlrpclib.ServerProxy('https://pypi.python.org/pypi')
+    pkgs = client.user_packages(username)  # returns [role, package]
+    return [x[1] for x in pkgs]
+
+
 def main(args=None):
     """
     Main entry point
@@ -158,6 +184,10 @@ def main(args=None):
     outpath = os.path.abspath(os.path.expanduser(args.out_dir))
     cachepath = os.path.abspath(os.path.expanduser(args.cache_dir))
     cache = DiskDataCache(cache_path=cachepath)
+
+    if args.user:
+        args.PROJECT = _pypi_get_projects_for_user(args.user)
+
     if args.query:
         DataQuery(args.project_id, args.PROJECT, cache).run_queries(
             backfill_num_days=args.backfill_days)
