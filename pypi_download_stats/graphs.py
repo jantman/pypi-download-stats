@@ -39,7 +39,7 @@ import logging
 from datetime import datetime
 from copy import deepcopy
 
-from bokeh.charts import Area, TimeSeries, output_file, defaults, save
+from bokeh.charts import Area
 from bokeh.models import (PanTool, BoxZoomTool, WheelZoomTool, SaveTool,
                           ResetTool, ResizeTool, HoverTool, GlyphRenderer)
 from bokeh.models.annotations import Legend
@@ -105,13 +105,19 @@ class FancyAreaGraph(object):
         ]
 
         # generate the stacked area graph
-        g = Area(self._data, x='Date', y=self._y_series_names,
-                 title=self._title, stack=True, xlabel='Date',
-                 ylabel='Downloads', tools=tools,
-                 # note the width and height will be set by JavaScript
-                 plot_height=400, plot_width=800,
-                 toolbar_location='above', legend=False
-        )
+        try:
+            g = Area(self._data, x='Date', y=self._y_series_names,
+                     title=self._title, stack=True, xlabel='Date',
+                     ylabel='Downloads', tools=tools,
+                     # note the width and height will be set by JavaScript
+                     plot_height=400, plot_width=800,
+                     toolbar_location='above', legend=False
+            )
+        except Exception as ex:
+            logger.error("Error generating %s graph", self._graph_id)
+            logger.error("Data: %s", self._data)
+            logger.error("y=%s", self._y_series_names)
+            raise ex
 
         lines = []
         legend_parts = []

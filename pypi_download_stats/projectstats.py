@@ -187,6 +187,8 @@ class ProjectStats(object):
         ret = {}
         for cache_date in self.cache_dates:
             data = self._cache_get(cache_date)
+            if len(data['by_version']) == 0:
+                data['by_version'] = {'other': 0}
             ret[cache_date] = data['by_version']
         return ret
 
@@ -202,6 +204,8 @@ class ProjectStats(object):
         ret = {}
         for cache_date in self.cache_dates:
             data = self._cache_get(cache_date)
+            if len(data['by_file_type']) == 0:
+                data['by_file_type'] = {'other': 0}
             ret[cache_date] = data['by_file_type']
         return ret
 
@@ -225,6 +229,8 @@ class ProjectStats(object):
                         self._shorten_version(inst_ver)
                     )
                     ret[cache_date][k] = count
+            if len(ret[cache_date]) == 0:
+                ret[cache_date]['unknown'] = 0
         return ret
 
     @property
@@ -247,6 +253,8 @@ class ProjectStats(object):
                         self._shorten_version(impl_ver)
                     )
                     ret[cache_date][k] = count
+            if len(ret[cache_date]) == 0:
+                ret[cache_date]['unknown'] = 0
         return ret
 
     @property
@@ -265,6 +273,8 @@ class ProjectStats(object):
                 self._column_value(x): data['by_system'][x]
                 for x in data['by_system']
             }
+            if len(ret[cache_date]) == 0:
+                ret[cache_date]['unknown'] = 0
         return ret
 
     @property
@@ -283,6 +293,8 @@ class ProjectStats(object):
             for cc, count in data['by_country'].items():
                 k = '%s (%s)' % (self._alpha2_to_country(cc), cc)
                 ret[cache_date][k] = count
+            if len(ret[cache_date]) == 0:
+                ret[cache_date]['unknown'] = 0
         return ret
 
     @property
@@ -308,6 +320,8 @@ class ProjectStats(object):
                                                     num_components=2)
                     k = self._compound_column_value(distro_name, ver)
                     ret[cache_date][k] = count
+            if len(ret[cache_date]) == 0:
+                ret[cache_date]['unknown'] = 0
         return ret
 
     @property
