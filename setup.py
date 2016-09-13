@@ -74,7 +74,7 @@ setup(
     author='Jason Antman',
     author_email='jason@jasonantman.com',
     packages=find_packages(),
-    package_data={'pypi-download-stats': ['templates/*.html']},
+    package_data={'pypi_download_stats': ['templates/*.html']},
     url=PROJECT_URL,
     description='Calculate detailed download stats and generate HTML and '
                 'badges for PyPI packages',
