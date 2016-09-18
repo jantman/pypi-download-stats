@@ -172,7 +172,9 @@ To generate reports against cached query data for the project "foo":
     $ pypi-download-stats -Q -P foo
 
 To run nightly and upload results to a website-hosting S3 bucket, I use the
-following script via cron:
+following script via cron (note the paths are specific to my purpose; also note
+the two commands, as ``s3cmd`` does not seem to set the MIME type for the SVG
+images correctly):
 
 .. code-block:: bash
 
@@ -182,7 +184,10 @@ following script via cron:
     cd /home/jantman/GIT/pypi-download-stats
     bin/pypi-download-stats -vv -U jantman
 
-    ~/venvs/foo/bin/s3cmd -r --delete-removed --stats sync pypi-stats s3://jantman-personal-public/
+    # sync html files
+    ~/venvs/foo/bin/s3cmd -r --delete-removed --stats --exclude='*.svg' sync pypi-stats s3://jantman-personal-public/
+    # sync SVG and set mime-type, since s3cmd gets it wrong
+    ~/venvs/foo/bin/s3cmd -r --delete-removed --stats --exclude='*.html' --mime-type='image/svg+xml' sync pypi-stats s3://jantman-personal-public/
 
 Cost
 ++++
