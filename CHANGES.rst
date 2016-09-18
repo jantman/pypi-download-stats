@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.2.1 (2016-09-18)
+------------------
+
+* Fix example cron S3 upload script in README.
+
 0.2.0 (2016-09-18)
 ------------------
 
