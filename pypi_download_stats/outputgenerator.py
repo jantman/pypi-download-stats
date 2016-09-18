@@ -314,8 +314,8 @@ class OutputGenerator(object):
         logger.info('Generating HTML')
         html = self._generate_html()
         html_path = os.path.join(self.output_dir, 'index.html')
-        with open(html_path, 'w') as fh:
-            fh.write(html)
+        with open(html_path, 'wb') as fh:
+            fh.write(html.encode('utf-8'))
         logger.info('HTML report written to %s', html_path)
         logger.info('Writing SVG badges')
         for name, svg in self._badges.items():
