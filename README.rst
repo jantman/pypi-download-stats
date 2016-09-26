@@ -1,6 +1,14 @@
 pypi-download-stats
 ========================
 
+.. image:: https://img.shields.io/pypi/v/pypi-download-stats.svg
+   :target: https://pypi.python.org/pypi/pypi-download-stats
+   :alt: PyPi package version
+
+.. image:: http://jantman-personal-public.s3-website-us-east-1.amazonaws.com/pypi-stats/pypi-download-stats/per-month.svg
+   :target: http://jantman-personal-public.s3-website-us-east-1.amazonaws.com/pypi-stats/pypi-download-stats/index.html
+   :alt: PyPi downloads
+
 .. image:: https://img.shields.io/github/forks/jantman/pypi-download-stats.svg
    :alt: GitHub Forks
    :target: https://github.com/jantman/pypi-download-stats/network
