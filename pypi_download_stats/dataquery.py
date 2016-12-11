@@ -143,6 +143,11 @@ Resource-class.html>`_
                               datasetId=self._DATASET_ID)
         while request is not None:
             response = request.execute()
+            # if the number of results is evenly divisible by the page size,
+            # we may end up with a last response that has no 'tables' key,
+            # and is empty.
+            if 'tables' not in response:
+                response['tables'] = []
             for table in response['tables']:
                 if table['type'] != 'TABLE':
                     logger.debug('Skipping %s (type=%s)',
