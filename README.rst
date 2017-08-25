@@ -90,7 +90,7 @@ and being updated in near-real-time. There may be download statistics functional
 Requirements
 ------------
 
-* Python 2.7+ (currently tested with 2.7, 3.2, 3.3, 3.4)
+* Python 2.7+ (currently tested with 2.7, 3.2-3.6)
 * Python `VirtualEnv <http://www.virtualenv.org/>`_ and ``pip`` (recommended installation method; your OS/distribution should have packages for these)
 
 pypi-download-stats relies on `bokeh <http://bokeh.pydata.org/en/latest/>`_ to generate
@@ -109,7 +109,7 @@ This isn't on pypi yet, ironically. Until it is:
 
 .. code-block:: bash
 
-    $ pip install git+https://github.com/jantman/pypi-download-stats.git
+    $ pip install pypi-download-stats
 
 Configuration
 -------------
