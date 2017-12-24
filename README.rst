@@ -17,17 +17,9 @@ pypi-download-stats
    :alt: GitHub Open Issues
    :target: https://github.com/jantman/pypi-download-stats/issues
 
-.. image:: https://landscape.io/github/jantman/pypi-download-stats/master/landscape.svg
-   :target: https://landscape.io/github/jantman/pypi-download-stats/master
-   :alt: Code Health
-
 .. image:: https://secure.travis-ci.org/jantman/pypi-download-stats.png?branch=master
    :target: http://travis-ci.org/jantman/pypi-download-stats
    :alt: travis-ci for master branch
-
-.. image:: https://codecov.io/github/jantman/pypi-download-stats/coverage.svg?branch=master
-   :target: https://codecov.io/github/jantman/pypi-download-stats?branch=master
-   :alt: coverage report for master branch
 
 .. image:: https://readthedocs.org/projects/pypi-download-stats/badge/?version=latest
    :target: https://readthedocs.org/projects/pypi-download-stats/?badge=latest
