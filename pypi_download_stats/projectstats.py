@@ -419,7 +419,7 @@ class ProjectStats(object):
         dates = self.cache_dates
         logger.debug("Cache has %d days of data", len(dates))
         if len(dates) > num_days:
-            dates = dates [(-1 * num_days):]
+            dates = dates[(-1 * num_days):]
         logger.debug("Looking at last %d days of data", len(dates))
         dl_sum = 0
         for cache_date in dates:

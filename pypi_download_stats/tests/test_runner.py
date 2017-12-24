@@ -37,7 +37,6 @@ Jason Antman <jason@jasonantman.com> <http://www.jasonantman.com>
 
 import sys
 import logging
-import pytest
 
 from pypi_download_stats.runner import (
     set_log_level_format, set_log_debug, set_log_info

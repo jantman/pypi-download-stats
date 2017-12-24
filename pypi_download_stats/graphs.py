@@ -106,12 +106,13 @@ class FancyAreaGraph(object):
 
         # generate the stacked area graph
         try:
-            g = Area(self._data, x='Date', y=self._y_series_names,
-                     title=self._title, stack=True, xlabel='Date',
-                     ylabel='Downloads', tools=tools,
-                     # note the width and height will be set by JavaScript
-                     plot_height=400, plot_width=800,
-                     toolbar_location='above', legend=False
+            g = Area(
+                self._data, x='Date', y=self._y_series_names,
+                title=self._title, stack=True, xlabel='Date',
+                ylabel='Downloads', tools=tools,
+                # note the width and height will be set by JavaScript
+                plot_height=400, plot_width=800,
+                toolbar_location='above', legend=False
             )
         except Exception as ex:
             logger.error("Error generating %s graph", self._graph_id)
@@ -204,21 +205,24 @@ class FancyAreaGraph(object):
         yvals = yvals[:last_idx+1]
 
         # Currently (bokeh 0.12.1) HoverTool won't show the tooltip for the last
-        # point in our line. As a hack for this, add a point with the same Y value
-        # and an X slightly before it.
+        # point in our line. As a hack for this, add a point with the same Y
+        # value and an X slightly before it.
         lastx = xvals[-1]
         xvals[-1] = lastx - 1000  # 1000 nanoseconds
         xvals.append(lastx)
         yvals.append(yvals[-1])
         # get the actual download counts from the original data
-        download_counts = [data[series_name][y] for y in range(0, len(yvals) - 1)]
+        download_counts = [
+            data[series_name][y] for y in range(0, len(yvals) - 1)
+        ]
         download_counts.append(download_counts[-1])
 
         # create a ColumnDataSource for the new overlay line
         data2 = {
             'x': xvals,  # Date/x values are numpy.datetime64
             'y': yvals,
-            # the following are hacks for data that we want in the HoverTool tooltip
+            # the following are hacks for data that we want in the HoverTool
+            # tooltip
             'SeriesName': [series_name for _ in yvals],
             # formatted date
             'FmtDate': [self.datetime64_to_formatted_date(x) for x in xvals],

@@ -254,10 +254,12 @@ Resource-class.html>`_
         :return: timestamp of newest row in table
         :rtype: int
         """
-        logger.debug('Querying for newest timestamp in table %s',
-                    table_name)
+        logger.debug(
+            'Querying for newest timestamp in table %s', table_name
+        )
         q = "SELECT TIMESTAMP_TO_SEC(MAX(timestamp)) AS max_ts %s;" % (
-            self._from_for_table(table_name))
+            self._from_for_table(table_name)
+        )
         res = self._run_query(q)
         ts = int(res[0]['max_ts'])
         logger.debug('Newest timestamp in table %s: %s', table_name, ts)
@@ -279,9 +281,9 @@ Resource-class.html>`_
             "%s " \
             "%s " \
             "GROUP BY file.project, file.version;" % (
-            self._from_for_table(table_name),
-            self._where_for_projects
-        )
+                self._from_for_table(table_name),
+                self._where_for_projects
+            )
         res = self._run_query(q)
         result = self._dict_for_projects()
         for row in res:
@@ -305,9 +307,9 @@ Resource-class.html>`_
             "%s " \
             "%s " \
             "GROUP BY file.project, file.type;" % (
-            self._from_for_table(table_name),
-            self._where_for_projects
-        )
+                self._from_for_table(table_name),
+                self._where_for_projects
+            )
         res = self._run_query(q)
         result = self._dict_for_projects()
         for row in res:
@@ -334,9 +336,9 @@ Resource-class.html>`_
             "%s " \
             "GROUP BY file.project, details.installer.name, " \
             "details.installer.version;" % (
-            self._from_for_table(table_name),
-            self._where_for_projects
-        )
+                self._from_for_table(table_name),
+                self._where_for_projects
+            )
         res = self._run_query(q)
         result = self._dict_for_projects()
         # iterate through results
@@ -373,9 +375,9 @@ Resource-class.html>`_
             "%s " \
             "GROUP BY file.project, details.implementation.name, " \
             "details.implementation.version;" % (
-            self._from_for_table(table_name),
-            self._where_for_projects
-        )
+                self._from_for_table(table_name),
+                self._where_for_projects
+            )
         res = self._run_query(q)
         result = self._dict_for_projects()
         # iterate through results
@@ -408,9 +410,9 @@ Resource-class.html>`_
             "%s " \
             "%s " \
             "GROUP BY file.project, details.system.name;" % (
-            self._from_for_table(table_name),
-            self._where_for_projects
-        )
+                self._from_for_table(table_name),
+                self._where_for_projects
+            )
         res = self._run_query(q)
         result = self._dict_for_projects()
         for row in res:
@@ -437,9 +439,9 @@ Resource-class.html>`_
             "%s " \
             "GROUP BY file.project, details.distro.name, " \
             "details.distro.version;" % (
-            self._from_for_table(table_name),
-            self._where_for_projects
-        )
+                self._from_for_table(table_name),
+                self._where_for_projects
+            )
         res = self._run_query(q)
         result = self._dict_for_projects()
         # iterate through results
@@ -472,9 +474,9 @@ Resource-class.html>`_
             "%s " \
             "%s " \
             "GROUP BY file.project, country_code;" % (
-            self._from_for_table(table_name),
-            self._where_for_projects
-        )
+                self._from_for_table(table_name),
+                self._where_for_projects
+            )
         res = self._run_query(q)
         result = self._dict_for_projects()
         for row in res:
@@ -551,7 +553,8 @@ Resource-class.html>`_
         :type available_table_names: list
         """
         if num_days == -1:
-            # skip the first date, under the assumption that data may be incomplete
+            # skip the first date, under the assumption that data may be
+            # incomplete
             logger.info('Backfilling all available history')
             start_table = available_table_names[1]
         else:
@@ -560,10 +563,12 @@ Resource-class.html>`_
         start_date = self._datetime_for_table_name(start_table)
         end_table = available_table_names[-3]
         end_date = self._datetime_for_table_name(end_table)
-        logger.debug('Backfilling history from %s (%s) to %s (%s)', start_table,
-                     start_date.strftime('%Y-%m-%d'), end_table,
-                     end_date.strftime('%Y-%m-%d'))
-        for days in range( (end_date - start_date).days + 1):
+        logger.debug(
+            'Backfilling history from %s (%s) to %s (%s)', start_table,
+            start_date.strftime('%Y-%m-%d'), end_table,
+            end_date.strftime('%Y-%m-%d')
+        )
+        for days in range((end_date - start_date).days + 1):
             backfill_dt = start_date + timedelta(days=days)
             if self._have_cache_for_date(backfill_dt):
                 logger.info('Cache present for all projects for %s; skipping',
