@@ -72,7 +72,7 @@ class ProjectStats(object):
         more than one date in series.
 
         :return: list of datetime objects for contiguous dates in cache
-        :rtype: list
+        :rtype: ``list``
         """
         all_dates = self.cache.get_dates_for_project(self.project_name)
         dates = []

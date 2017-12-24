@@ -1,5 +1,5 @@
-pypi_download_stats package
-===========================
+pypi\_download\_stats package
+=============================
 
 .. automodule:: pypi_download_stats
     :members:

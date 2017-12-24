@@ -358,7 +358,7 @@ def filter_data_columns(data):
     :param data: data dict as returned by ProjectStats attributes
     :type data: dict
     :return: sorted list of distinct keys
-    :rtype: list
+    :rtype: ``list``
     """
     keys = set()
     for dt, d in data.items():

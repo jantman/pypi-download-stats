@@ -71,7 +71,7 @@ def parse_args(argv):
     Use Argparse to parse command-line arguments.
 
     :param argv: list of arguments to parse (``sys.argv[1:]``)
-    :type argv: list
+    :type argv: ``list``
     :return: parsed arguments
     :rtype: :py:class:`argparse.Namespace`
     """
@@ -160,7 +160,7 @@ def _pypi_get_projects_for_user(username):
     :param username: PyPI username
     :type username: str
     :return: list of string project names
-    :rtype: list
+    :rtype: ``list``
     """
     client = xmlrpclib.ServerProxy('https://pypi.python.org/pypi')
     pkgs = client.user_packages(username)  # returns [role, package]

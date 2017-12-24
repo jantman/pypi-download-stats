@@ -64,7 +64,7 @@ class DataQuery(object):
           variable.
         :type project_id: str
         :param project_names: list of string project names to query for
-        :type project_names: list
+        :type project_names: ``list``
         :param cache_instance: DataCache instance
         :type cache_instance: :py:class:`~.DiskDataCache`
         """
@@ -134,7 +134,7 @@ Resource-class.html>`_
         Get a list of PyPI downloads table (sharded per day) IDs.
 
         :return: list of table names (strings)
-        :rtype: list
+        :rtype: ``list``
         """
         all_table_names = []  # matching per-date table names
         logger.info('Querying for all tables in dataset')
@@ -195,7 +195,7 @@ Resource-class.html>`_
         :param query: the query to run
         :type query: str
         :return: list of per-row response dicts (key => value)
-        :rtype: list
+        :rtype: ``list``
         """
         query_request = self.service.jobs()
         logger.debug('Running query: %s', query)
@@ -269,8 +269,8 @@ Resource-class.html>`_
         """
         Query for download data broken down by version, for one day.
 
-        :param table_name:
-        :type table_name:
+        :param table_name: table name to query against
+        :type table_name: str
         :return: dict of download information by version; keys are project
           name, values are a dict of version to download count
         :rtype: dict
@@ -295,8 +295,8 @@ Resource-class.html>`_
         """
         Query for download data broken down by file type, for one day.
 
-        :param table_name:
-        :type table_name:
+        :param table_name: table name to query against
+        :type table_name: str
         :return: dict of download information by file type; keys are project
           name, values are a dict of file type to download count
         :rtype: dict
@@ -321,8 +321,8 @@ Resource-class.html>`_
         """
         Query for download data broken down by installer, for one day.
 
-        :param table_name:
-        :type table_name:
+        :param table_name: table name to query against
+        :type table_name: str
         :return: dict of download information by installer; keys are project
           name, values are a dict of installer names to dicts of installer
           version to download count.
@@ -360,8 +360,8 @@ Resource-class.html>`_
         Query for download data broken down by Python implementation, for one
         day.
 
-        :param table_name:
-        :type table_name:
+        :param table_name: table name to query against
+        :type table_name: str
         :return: dict of download information by implementation; keys are
           project name, values are a dict of implementation names to dicts of
           implementation version to download count.
@@ -398,8 +398,8 @@ Resource-class.html>`_
         """
         Query for download data broken down by system, for one day.
 
-        :param table_name:
-        :type table_name:
+        :param table_name: table name to query against
+        :type table_name: str
         :return: dict of download information by system; keys are project name,
           values are a dict of system names to download count.
         :rtype: dict
@@ -425,8 +425,8 @@ Resource-class.html>`_
         """
         Query for download data broken down by OS distribution, for one day.
 
-        :param table_name:
-        :type table_name:
+        :param table_name: table name to query against
+        :type table_name: str
         :return: dict of download information by distro; keys are project name,
           values are a dict of distro names to dicts of distro version to
           download count.
@@ -462,8 +462,8 @@ Resource-class.html>`_
         """
         Query for download data broken down by country code, for one day.
 
-        :param table_name:
-        :type table_name:
+        :param table_name: table name to query against
+        :type table_name: str
         :return: dict of download information by country code; keys are project
           name, values are a dict of country code to download count.
         :rtype: dict
@@ -550,7 +550,7 @@ Resource-class.html>`_
           if missing
         :type num_days: int
         :param available_table_names: names of available per-date tables
-        :type available_table_names: list
+        :type available_table_names: ``list``
         """
         if num_days == -1:
             # skip the first date, under the assumption that data may be

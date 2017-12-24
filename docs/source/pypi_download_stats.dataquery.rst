@@ -1,5 +1,5 @@
-pypi_download_stats.dataquery module
-====================================
+pypi\_download\_stats\.dataquery module
+=======================================
 
 .. automodule:: pypi_download_stats.dataquery
     :members:
