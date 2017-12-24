@@ -1,6 +1,13 @@
 Changelog
 =========
 
+Unreleased Changes
+------------------
+
+* Stop testing and supporting py33; start testing py36.
+* Stop testing and supporting py34, as we rely on ``pandas`` that doesn't support 3.4.
+* Many fixes for pep8/flakes and docs build.
+
 0.2.1 (2016-09-18)
 ------------------
 
