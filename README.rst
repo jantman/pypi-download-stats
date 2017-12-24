@@ -52,7 +52,9 @@ For the time being, I want to (a) give myself a way to get simple download stats
 and badges like the old PyPI legacy (downloads per day, week and month) as well
 as (b) enable some higher-granularity analysis.
 
-**Note** this package is *very* young; I wrote it as an evening/weekend project,
+**Note** that this is a relatively heavy-weight solution; it has many dependencies and is really intended for people whose main need is to generate detailed historical graphs and download count badges for their projects. If your really just want to perform some ad-hoc queries, counts, or simple data analysis on the PyPI downloads dataset, a project like `Ofek's pypinfo <https://github.com/ofek/pypinfo>`_ would be a simpler alternative.
+
+**Also note** this package is *very* young; I wrote it as an evening/weekend project,
 hoping to only take a few days on it. Though writing this makes me want to bathe
 immediately, it has no tests. If people start using it, I'll change that.
 
@@ -101,7 +103,7 @@ This isn't on pypi yet, ironically. Until it is:
 
 .. code-block:: bash
 
-    $ pip install git+https://github.com/jantman/pypi-download-stats.git
+    $ pip install pypi-download-stats
 
 Configuration
 -------------
