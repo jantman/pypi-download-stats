@@ -1,5 +1,5 @@
-pypi\_download\_stats\.diskdatacache module
-===========================================
+pypi\_download\_stats.diskdatacache module
+==========================================
 
 .. automodule:: pypi_download_stats.diskdatacache
     :members:
