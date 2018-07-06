@@ -1,5 +1,5 @@
-pypi\_download\_stats\.outputgenerator module
-=============================================
+pypi\_download\_stats.outputgenerator module
+============================================
 
 .. automodule:: pypi_download_stats.outputgenerator
     :members:
