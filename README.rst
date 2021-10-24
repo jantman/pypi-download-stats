@@ -21,9 +21,9 @@ DEPRECATED - pypi-download-stats
    :target: https://readthedocs.org/projects/pypi-download-stats/?badge=latest
    :alt: sphinx documentation for latest release
 
-.. image:: http://www.repostatus.org/badges/latest/active.svg
-   :alt: Project Status: Active - The project has reached a stable, usable state and is being actively developed.
-   :target: http://www.repostatus.org/#active
+.. image:: https://www.repostatus.org/badges/latest/abandoned.svg
+   :alt: Project Status: Abandoned – Initial development has started, but there has not yet been a stable, usable release; the project has been abandoned and the author(s) do not intend on continuing development.
+   :target: https://www.repostatus.org/#abandoned
 
 IMPORTANT - PROJECT ABANDONED
 -----------------------------
