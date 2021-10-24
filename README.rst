@@ -1,13 +1,9 @@
-pypi-download-stats
-========================
+DEPRECATED - pypi-download-stats
+================================
 
 .. image:: https://img.shields.io/pypi/v/pypi-download-stats.svg
    :target: https://pypi.python.org/pypi/pypi-download-stats
    :alt: PyPi package version
-
-.. image:: http://jantman-personal-public.s3-website-us-east-1.amazonaws.com/pypi-stats/pypi-download-stats/per-month.svg
-   :target: http://jantman-personal-public.s3-website-us-east-1.amazonaws.com/pypi-stats/pypi-download-stats/index.html
-   :alt: PyPi downloads
 
 .. image:: https://img.shields.io/github/forks/jantman/pypi-download-stats.svg
    :alt: GitHub Forks
@@ -28,6 +24,11 @@ pypi-download-stats
 .. image:: http://www.repostatus.org/badges/latest/active.svg
    :alt: Project Status: Active - The project has reached a stable, usable state and is being actively developed.
    :target: http://www.repostatus.org/#active
+
+IMPORTANT - PROJECT ABANDONED
+-----------------------------
+
+A quick Google search indicates that there are now multiple websites, such as `PyPiStats.org <https://pypistats.org/>`_ that provide this information. As such, I'm abandoning this project.
 
 Introduction
 ------------

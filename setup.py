@@ -53,7 +53,7 @@ requires = [
 ]
 
 classifiers = [
-    'Development Status :: 3 - Alpha',
+    'Development Status :: 7 - Inactive',
     'Environment :: Console',
     'Intended Audience :: Developers',
     'License :: OSI Approved :: GNU Affero General Public License v3 '
